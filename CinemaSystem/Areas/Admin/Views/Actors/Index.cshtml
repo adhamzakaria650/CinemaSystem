@@ -1,0 +1,239 @@
+﻿@using CinemaSystem.ViewModels.Actors
+@model ActorVM
+@section Styles {
+    <style>
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: flex-end;
+        }
+            .filters .form-group {
+                margin: 0;
+                min-width: 200px;
+            }
+
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            min-width: 180px;
+            max-width: 280px;
+        }
+
+        .chip {
+            padding: 3px 10px;
+            border-radius: 999px;
+            background: var(--bg);
+            border: 1px solid var(--line);
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .actor-thumb {
+            display: block;
+            width: 84px;
+            height: 56px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--line);
+            background: var(--bg);
+        }
+
+            .actor-thumb.none {
+                display: grid;
+                place-items: center;
+                color: var(--muted);
+                font-size: 12px;
+            }
+
+        .pagination {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+            list-style: none;
+            margin: 24px 0 0;
+            padding: 0;
+        }
+
+            .pagination .page-link {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 40px;
+                height: 40px;
+                padding: 0 14px;
+                border: 1px solid var(--line);
+                border-radius: 8px;
+                background: var(--surface);
+                color: var(--text);
+                font-weight: 500;
+                text-decoration: none;
+                transition: background .15s, border-color .15s, color .15s;
+            }
+
+            .pagination .page-item:not(.active):not(.disabled) .page-link:hover {
+                background: var(--bg);
+                border-color: var(--accent);
+            }
+
+            .pagination .page-item.active .page-link {
+                background: var(--accent);
+                border-color: var(--accent);
+                color: var(--accent-ink);
+                font-weight: 600;
+            }
+
+            .pagination .page-item.disabled .page-link {
+                opacity: .4;
+                cursor: not-allowed;
+                pointer-events: none;
+            }
+
+            .pagination .page-link:focus-visible {
+                outline: 2px solid var(--accent);
+                outline-offset: 2px;
+            }
+
+        .empty {
+            text-align: center;
+            padding: 40px 0;
+            color: var(--muted);
+        }
+    </style>
+}
+
+<div class="page-head">
+    <p style="margin:0;color:var(--muted)">@Model.Actors.Count() actors</p>
+    <a class="btn btn-primary" href="/Admin/Actors/Create">Add actor</a>
+</div>
+
+<!-- Filters -->
+<form method="get" class="card filters" style="margin-bottom:18px">
+    <div class="form-group">
+        <label for="name">Name</label>
+        <input id="name" name="Name" class="form-control" placeholder="Search by name" />
+    </div>
+    <div class="form-group">
+        <label for="status">Status</label>
+        <select id="status" name="Status" class="form-control">
+            <option value="">All</option>
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Filter</button>
+    <a class="btn" href="/Admin/Actors/Index">Clear</a>
+</form>
+
+<!-- Table -->
+<div class="card">
+    @if (Model.Actors.Count() == 0)
+    {
+        <div class="empty">
+            No actors match your filters.
+            <a href="/Admin/Actors/Index">Clear filters</a>
+        </div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Image</th>
+                        <th>Movies</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var a in Model.Actors)
+                    {
+                        <tr>
+                            <td>@a.Id</td>
+                            <td>@a.Name</td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(a.Image))
+                                {
+                                    <img class="actor-thumb" src="~/images/@a.Image" alt="@a.Name" loading="lazy" />
+                                }
+                                else
+                                {
+                                    <span class="actor-thumb none">No image</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="chips">
+                                @foreach(var m in Model.actorMovies)
+                                {
+                                    if (a.Id == m.ActorID)
+                                    {                                        
+                                        <span class="chip" >@m.movie.Name</span>
+                                        <br />
+                                    }
+                                }
+                                </div>
+                            </td>
+                            <td>
+                                @if (a.Status)
+                                {
+                                    <span class="badge badge-ok">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-err">Inactive</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="actions">
+                                    <a href="/Admin/Actors/Update/@a.Id" class="btn btn-sm">Edit</a>
+                                    <a href="/Admin/Actors/Delete/@a.Id" class="btn btn-sm btn-danger"
+                                       data-confirm="Delete actor “@a.Name”?">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<!-- Pagination -->
+<nav aria-label="Actors pagination">
+    <ul class="pagination">
+        @if (ViewBag.currentPage > 1)
+        {
+            <li class="page-item"><a href="/Admin/Actors/Index?page=@(ViewBag.currentPage - 1)" class="page-link">Previous</a></li>
+        }
+        else
+        {
+            <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a></li>
+        }
+        @for (int i = 1; i <= ViewBag.totalPages; i++)
+        {
+            if (i == ViewBag.currentPage)
+            {
+                <li class="page-item active">
+                    <a class="page-link" href="#" aria-current="page">@i</a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item"><a class="page-link" href="/Admin/Actors/Index?page=@i">@i</a></li>
+            }
+        }
+        @if (ViewBag.currentPage < ViewBag.totalPages)
+        {
+            <li class="page-item"><a href="/Admin/Actors/Index?page=@(ViewBag.currentPage + 1)" class="page-link">Next</a></li>
+        }
+        else
+        {
+            <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a></li>
+        }
+    </ul>
+</nav>

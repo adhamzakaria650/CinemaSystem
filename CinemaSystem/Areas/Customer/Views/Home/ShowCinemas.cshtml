@@ -1,0 +1,135 @@
+﻿@model List<Cinema>
+@section Styles {
+    <style>
+        .cinema-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 22px;
+        }
+
+        .cinema-card {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform .2s, border-color .2s;
+        }
+
+            .cinema-card:hover {
+                transform: translateY(-4px);
+                border-color: var(--accent);
+            }
+
+        .cinema-card-link {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .cinema-image {
+            position: relative;
+            aspect-ratio: 16 / 10;
+            overflow: hidden;
+            background: var(--bg);
+        }
+
+            .cinema-image img {
+                position: absolute;
+                inset: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+
+        .cinema-image-none {
+            height: 100%;
+            display: grid;
+            place-items: center;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .cinema-body {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 16px;
+            flex: 1;
+        }
+
+        .cinema-name {
+            font-size: 20px;
+        }
+
+        .cinema-desc {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .cinema-cta {
+            margin-top: auto;
+            padding-top: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .empty {
+            text-align: center;
+            padding: 60px 0;
+            color: var(--muted);
+        }
+
+        .page-title {
+            margin-bottom: 24px;
+            font-size: 32px;
+        }
+    </style>
+}
+
+<h1 class="page-title">Cinemas</h1>
+
+@if (Model == null || Model.Count == 0)
+{
+    <div class="empty">No cinemas available right now.</div>
+}
+else
+{
+    <div class="cinema-grid">
+        @foreach (var cinema in Model)
+        {
+            <article class="cinema-card">
+                <a class="cinema-card-link" asp-area="Customer" asp-controller="Home" asp-action="ShowCinemaMovies" asp-route-id="@cinema.Id" aria-label="View @cinema.Name">
+                    <div class="cinema-image">
+                        @if (!string.IsNullOrEmpty(cinema.Image))
+                        {
+                            <img src="~/images/@cinema.Image" alt="@cinema.Name" loading="lazy" />
+                        }
+                        else
+                        {
+                            <div class="cinema-image-none">No image</div>
+                        }
+                    </div>
+
+                    <div class="cinema-body">
+                        <h3 class="cinema-name">@cinema.Name</h3>
+
+                        @if (!string.IsNullOrWhiteSpace(cinema.Description))
+                        {
+                            <p class="cinema-desc">@cinema.Description</p>
+                        }
+                        <span class="cinema-cta">View movies</span>
+                    </div>
+                </a>
+            </article>
+        }
+    </div>
+}

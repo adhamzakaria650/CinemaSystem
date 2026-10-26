@@ -1,0 +1,93 @@
+﻿@section Styles {
+    <style>
+        .form-card {
+            max-width: 640px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .req {
+            color: var(--err);
+        }
+
+        .hint {
+            color: var(--muted);
+            font-size: 13px;
+        }
+    </style>
+}
+
+<div class="card form-card">
+    <form action="/Admin/Movies/Create" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="Name">Name <span class="req">*</span></label>
+            <input type="text" id="Name" name="Name" class="form-control"
+                   placeholder="e.g. Vox Movie" />
+        </div>
+        <div class="form-group">
+            <label for="Image">Movie Main Picture <span class="req">*</span></label>
+            <input type="file" id="MainImage" name="MainImage" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="Image">Movie Sub Pictures <span class="req">*</span></label>
+            <input type="file" id="SubImages" name="SubImages" class="form-control" multiple />
+        </div>
+        <div class="form-group">
+            <label for="category">Category</label>
+            <select id="Category" name="CategoryId" class="form-control">
+                @foreach (var i in ViewBag.Categories)
+                    {
+                        <option value=@i.Id>@i.Name</option>
+                    }
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="Cinema">Cinema</label>
+            <select id="Cinema" name="CinemaId" class="form-control">
+                @foreach (var i in ViewBag.Cinemas)
+                    {
+                        <option value=@i.Id>@i.Name</option>
+                    }
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="Actors">Actors</label>
+            <select id="Actors" name="ActorId" class="form-control" multiple>
+                @foreach (var i in ViewBag.Actors)
+                    {
+                    <option value=@i.Id>@i.Name</option>
+                    }
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="Price">Price <span class="req">*</span></label>
+            <input type="number" id="Price" name="Price" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="Time">Time <span class="req">*</span></label>
+            <input type="datetime-local" id="Time" name="Time" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label for="Description">Description</label>
+            <textarea id="Description" name="Description" class="form-control"
+                      placeholder="Short description of this movie"></textarea>
+            <span class="hint">Optional, up to 500 characters.</span>
+        </div>
+        <div class="form-group">
+            <label for="Status">Status</label>
+            <select id="Status" name="Status" class="form-control">
+                <option value="true" >Active</option>
+                <option value="false">Inactive</option>
+            </select>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save movie</button>
+            <a class="btn" href="/Admin/Movies/Index">Cancel</a>
+        </div>
+    </form>
+</div>

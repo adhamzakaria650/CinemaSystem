@@ -1,0 +1,187 @@
+﻿@model IEnumerable<Movie>
+@section Styles {
+    <style>
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 22px;
+        }
+
+        .movie-card {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform .2s, border-color .2s;
+        }
+
+            .movie-card:hover {
+                transform: translateY(-4px);
+                border-color: var(--accent);
+            }
+
+        .movie-card-link {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .movie-poster {
+            position: relative;
+            aspect-ratio: 2 / 3;
+            background: var(--bg);
+        }
+
+            .movie-poster img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+
+        .movie-poster-none {
+            height: 100%;
+            display: grid;
+            place-items: center;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .movie-tag {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 3px 10px;
+            border-radius: 999px;
+            background: rgba(15,15,23,.85);
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .movie-unavailable {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 6px;
+            text-align: center;
+            background: rgba(200,67,79,.9);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .movie-body {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 14px;
+            flex: 1;
+        }
+
+        .movie-title {
+            font-size: 17px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .movie-meta {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .movie-foot {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: auto;
+            padding-top: 12px;
+        }
+
+        .movie-price {
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .movie-cta {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .movie-card:hover .movie-cta {
+            color: var(--text);
+        }
+
+        .empty {
+            text-align: center;
+            padding: 60px 0;
+            color: var(--muted);
+        }
+
+        .page-title {
+            margin-bottom: 24px;
+            font-size: 32px;
+        }
+    </style>
+}
+
+<h1 class="page-title">Movies</h1>
+
+@if (Model == null || Model.Count() == 0)
+{
+    <div class="empty">No movies available right now.</div>
+}
+else
+{
+    <div class="movie-grid">
+        @foreach (var movie in Model)
+        {
+            <article class="movie-card">
+                <a class="movie-card-link" asp-area="Customer" asp-controller="Home" asp-action="ShowMovieDetails" asp-route-id="@movie.Id" aria-label="View @movie.Name">
+                    <div class="movie-poster">
+                        @if (!string.IsNullOrEmpty(movie.MainImg))
+                        {
+                            <img src="/images/@movie.MainImg" alt="@movie.Name" loading="lazy" />
+                        }
+                        else
+                        {
+                            <div class="movie-poster-none">No poster</div>
+                        }
+
+                        @if (movie.category != null)
+                        {
+                            <span class="movie-tag">@movie.category.Name</span>
+                        }
+                        @if (!movie.Status)
+                        {
+                            <span class="movie-unavailable">Unavailable</span>
+                        }
+                    </div>
+
+                    <div class="movie-body">
+                        <h3 class="movie-title">@movie.Name</h3>
+
+                        <p class="movie-meta">
+                            @movie.Time.ToString("dd MMM yyyy") &middot; @movie.Time.ToString("hh:mm tt")
+                        </p>
+                        @if (movie.cinema != null)
+                        {
+                            <p class="movie-meta">@movie.cinema.Name</p>
+                        }
+
+                        <div class="movie-foot">
+                            <span class="movie-price">@movie.Price.ToString("0.##") EGP</span>
+                            <span class="movie-cta">Details</span>
+                        </div>
+                    </div>
+                </a>
+            </article>
+        }
+    </div>
+}

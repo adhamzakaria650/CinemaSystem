@@ -1,0 +1,268 @@
+﻿@using CinemaSystem.ViewModels.Dashboard
+@model DashboardVM
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Dashboard";
+}
+
+@section Styles {
+    <style>
+        a.stat {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            transition: border-color .15s;
+        }
+
+            a.stat:hover {
+                border-color: var(--accent);
+            }
+
+        .charts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr));
+            gap: 16px;
+        }
+
+        .chart-card h2 {
+            font-size: 17px;
+            margin-bottom: 2px;
+        }
+
+        .chart-card p {
+            margin: 0 0 14px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .chart-box {
+            position: relative;
+            height: 300px;
+        }
+
+        .chart-empty {
+            height: 100%;
+            display: grid;
+            place-items: center;
+            color: var(--muted);
+            border: 1px dashed var(--line);
+            border-radius: 8px;
+        }
+    </style>
+}
+
+<!-- Totals -->
+<div class="stats">
+    <a class="stat" href="/Admin/Movies/Index">
+        <div class="stat-label">Movies</div>
+        <div class="stat-value">@Model.TotalMovies</div>
+    </a>
+    <a class="stat" href="/Admin/Cinemas/Index">
+        <div class="stat-label">Cinemas</div>
+        <div class="stat-value">@Model.TotalCinemas</div>
+    </a>
+    <a class="stat" href="/Admin/Actors/Index">
+        <div class="stat-label">Actors</div>
+        <div class="stat-value">@Model.TotalActors</div>
+    </a>
+    <a class="stat" href="/Admin/Categories/Index">
+        <div class="stat-label">Categories</div>
+        <div class="stat-value">@Model.TotalCategories</div>
+    </a>
+</div>
+
+<!-- Charts -->
+<div class="charts">
+
+    <section class="card chart-card">
+        <h2>Movies per category</h2>
+        <p>How the movie catalog is split across categories.</p>
+        <div class="chart-box">
+            @if (Model.MoviesPerCategory.Count == 0)
+            {
+                <div class="chart-empty">No data yet</div>
+            }
+            else
+            {
+
+                <canvas id="categoryChart" aria-label="Movies per category"></canvas>
+            }
+        </div>
+    </section>
+
+    <section class="card chart-card">
+        <h2>Movies per cinema</h2>
+        <p>Number of movies showing in each cinema.</p>
+        <div class="chart-box">
+            @if (Model.MoviesPerCinema.Count == 0)
+            {
+                <div class="chart-empty">No data yet</div>
+            }
+            else
+            {
+
+                <canvas id="cinemaChart" aria-label="Movies per cinema"></canvas>
+            }
+        </div>
+    </section>
+
+    <section class="card chart-card">
+        <h2>Top actors</h2>
+        <p>Actors who appear in the most movies.</p>
+        <div class="chart-box">
+            @if (Model.TopActors.Count == 0)
+            {
+                <div class="chart-empty">No data yet</div>
+            }
+            else
+            {
+
+                <canvas id="actorChart" aria-label="Top actors"></canvas>
+            }
+        </div>
+    </section>
+
+    <section class="card chart-card">
+        <h2>Movie status</h2>
+        <p>Active movies compared with inactive ones.</p>
+        <div class="chart-box">
+            @if (Model.ActiveMovies + Model.InactiveMovies == 0)
+            {
+                <div class="chart-empty">No data yet</div>
+            }
+            else
+            {
+
+                <canvas id="statusChart" aria-label="Movie status"></canvas>
+            }
+        </div>
+    </section>
+
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script>
+        (function () {
+            "use strict";
+            if (typeof Chart === "undefined") return;
+
+            var data = {
+                categories: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MoviesPerCategory)),
+                cinemas:    @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MoviesPerCinema)),
+                actors:     @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TopActors)),
+                status: [@Model.ActiveMovies, @Model.InactiveMovies]
+            };
+
+            var palette = ["#e8b64c", "#6c8cff", "#3fb68b", "#e0657a", "#9b7bd8", "#4fb3d9", "#f08a4b", "#8bc34a"];
+            var charts = [];
+
+            function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+            function labels(list) { return list.map(function (x) { return x.Label; }); }
+            function values(list) { return list.map(function (x) { return x.Value; }); }
+            function colors(n) {
+                var out = [];
+                for (var i = 0; i < n; i++) out.push(palette[i % palette.length]);
+                return out;
+            }
+            function make(id, config) {
+                var el = document.getElementById(id);
+                if (el) charts.push(new Chart(el, config));
+            }
+
+            function render() {
+                charts.forEach(function (c) { c.destroy(); });
+                charts = [];
+
+                var line = css("--line"), surface = css("--surface"), accent = css("--accent");
+                Chart.defaults.color = css("--muted");
+                Chart.defaults.font.family = css("--font-body");
+
+                var common = { responsive: true, maintainAspectRatio: false };
+
+                // Movies per category (doughnut)
+                make("categoryChart", {
+                    type: "doughnut",
+                    data: {
+                        labels: labels(data.categories),
+                        datasets: [{
+                            data: values(data.categories),
+                            backgroundColor: colors(data.categories.length),
+                            borderColor: surface,
+                            borderWidth: 3
+                        }]
+                    },
+                    options: Object.assign({}, common, { cutout: "62%", plugins: { legend: { position: "bottom" } } })
+                });
+
+                // Movies per cinema (bar)
+                make("cinemaChart", {
+                    type: "bar",
+                    data: {
+                        labels: labels(data.cinemas),
+                        datasets: [{
+                            label: "Movies",
+                            data: values(data.cinemas),
+                            backgroundColor: accent,
+                            borderRadius: 6,
+                            maxBarThickness: 48
+                        }]
+                    },
+                    options: Object.assign({}, common, {
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { grid: { display: false } },
+                            y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: line } }
+                        }
+                    })
+                });
+
+                // Top actors (horizontal bar)
+                make("actorChart", {
+                    type: "bar",
+                    data: {
+                        labels: labels(data.actors),
+                        datasets: [{
+                            label: "Movies",
+                            data: values(data.actors),
+                            backgroundColor: "#6c8cff",
+                            borderRadius: 6,
+                            maxBarThickness: 28
+                        }]
+                    },
+                    options: Object.assign({}, common, {
+                        indexAxis: "y",
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: line } },
+                            y: { grid: { display: false } }
+                        }
+                    })
+                });
+
+                // Movie status (doughnut)
+                make("statusChart", {
+                    type: "doughnut",
+                    data: {
+                        labels: ["Active", "Inactive"],
+                        datasets: [{
+                            data: data.status,
+                            backgroundColor: ["#3fb68b", "#e0657a"],
+                            borderColor: surface,
+                            borderWidth: 3
+                        }]
+                    },
+                    options: Object.assign({}, common, { cutout: "62%", plugins: { legend: { position: "bottom" } } })
+                });
+            }
+
+            render();
+
+            // Redraw when the theme toggle in the layout changes light/dark
+            new MutationObserver(render).observe(document.documentElement, {
+                attributes: true,
+                attributeFilter: ["data-theme"]
+            });
+        })();
+    </script>
+}

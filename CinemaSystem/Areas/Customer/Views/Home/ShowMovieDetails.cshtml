@@ -1,0 +1,338 @@
+﻿@using CinemaSystem.ViewModels.Movies
+@model ShowMovieDetailsVM
+@section Styles {
+    <style>
+        .back {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--muted);
+            text-decoration: none;
+        }
+
+            .back:hover {
+                color: var(--accent);
+            }
+
+        .details {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        /* Gallery */
+        .main-image {
+            position: relative;
+            aspect-ratio: 2 / 3;
+            overflow: hidden;
+            border-radius: 12px;
+            border: 1px solid var(--line);
+            background: var(--surface);
+        }
+
+            .main-image img {
+                position: absolute;
+                inset: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+
+        .no-image {
+            height: 100%;
+            display: grid;
+            place-items: center;
+            color: var(--muted);
+        }
+
+        .thumbs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .thumb {
+            position: relative;
+            width: 76px;
+            height: 76px;
+            padding: 0;
+            overflow: hidden;
+            border: 2px solid var(--line);
+            border-radius: 8px;
+            background: var(--surface);
+            cursor: pointer;
+        }
+
+            .thumb img {
+                position: absolute;
+                inset: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+
+            .thumb:hover {
+                border-color: var(--muted);
+            }
+
+            .thumb.active {
+                border-color: var(--accent);
+            }
+
+        /* Info */
+        .info h1 {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .tag {
+            padding: 4px 12px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            background: var(--surface);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+            .tag.gold {
+                color: var(--accent);
+                border-color: var(--accent);
+            }
+
+            .tag.red {
+                color: #ff8a93;
+                border-color: #c8434f;
+            }
+
+        .facts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .fact {
+            padding: 14px 16px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: var(--surface);
+        }
+
+            .fact span {
+                display: block;
+                color: var(--muted);
+                font-size: 13px;
+            }
+
+            .fact strong {
+                font-size: 17px;
+            }
+
+            .fact.price strong {
+                color: var(--accent);
+                font-size: 22px;
+            }
+
+        .info h2 {
+            font-size: 22px;
+            margin: 0 0 10px;
+        }
+
+        .description {
+            color: var(--muted);
+            max-width: 70ch;
+            margin: 0 0 32px;
+            white-space: pre-line;
+        }
+
+        /* Actors */
+        .actors {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 16px;
+        }
+
+        .actor {
+            text-align: center;
+        }
+
+        .actor-photo {
+            position: relative;
+            width: 88px;
+            height: 88px;
+            margin: 0 auto 8px;
+            overflow: hidden;
+            border-radius: 50%;
+            border: 2px solid var(--line);
+            background: var(--surface);
+        }
+
+            .actor-photo img {
+                position: absolute;
+                inset: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+
+            .actor-photo span {
+                height: 100%;
+                display: grid;
+                place-items: center;
+                color: var(--muted);
+                font-weight: 600;
+                font-size: 24px;
+            }
+
+        .actor-name {
+            font-size: 14px;
+        }
+
+        @@media (max-width: 860px) {
+            .details {
+                grid-template-columns: 1fr;
+                gap: 28px;
+            }
+
+            .main-image {
+                max-width: 380px;
+            }
+
+            .info h1 {
+                font-size: 32px;
+            }
+        }
+    </style>
+}
+
+<a class="back" href="/Customer/Home/Index">&larr; Back to movies</a>
+
+<div class="details">
+
+    <!-- Images -->
+    <section aria-label="Movie images">
+        <div class="main-image">
+            @if (!string.IsNullOrEmpty(Model.movie.MainImg))
+            {
+                <img id="mainImg" src="~/images/@Model.movie.MainImg" alt="@Model.movie.Name" />
+            }
+            else
+            {
+                <div class="no-image">No poster</div>
+            }
+        </div>
+
+        @if (Model.movieSubImages.Count > 0)
+        {
+            <div class="thumbs">
+                @if (!string.IsNullOrEmpty(Model.movie.MainImg))
+                {
+                    <button type="button" class="thumb active" data-src="/images/@Model.movie.MainImg" aria-label="Show main image">
+                        <img src="~/images/@Model.movie.MainImg" alt="" loading="lazy" />
+                    </button>
+                }
+                @foreach (var img in Model.movieSubImages)
+                {
+                    <button type="button" class="thumb" data-src="/images/@img.Image" aria-label="Show image">
+                        <img src="~/images/@img.Image" alt="" loading="lazy" />
+                    </button>
+                }
+            </div>
+        }
+    </section>
+
+    <!-- Info -->
+    <section class="info">
+        <h1>@Model.movie.Name</h1>
+
+        <div class="tags">
+            @if (Model.movie.category != null)
+            {
+                <span class="tag gold">@Model.movie.category.Name</span>
+            }
+            @if (!Model.movie.Status)
+            {
+                <span class="tag red">Unavailable</span>
+            }
+        </div>
+
+        <div class="facts">
+            <div class="fact price">
+                <span>Price</span>
+                <strong>@Model.movie.Price.ToString("0.##") EGP</strong>
+            </div>
+            <div class="fact">
+                <span>Date</span>
+                <strong>@Model.movie.Time.ToString("dd MMM yyyy")</strong>
+            </div>
+            <div class="fact">
+                <span>Time</span>
+                <strong>@Model.movie.Time.ToString("hh:mm tt")</strong>
+            </div>
+            <div class="fact">
+                <span>Cinema</span>
+                <strong>@(Model.movie.cinema?.Name ?? "—")</strong>
+            </div>
+        </div>
+
+        <h2>About the movie</h2>
+        <p class="description">@(string.IsNullOrWhiteSpace(Model.movie.Description) ? "No description yet." : Model.movie.Description)</p>
+
+        <h2>Cast</h2>
+        @if (Model.actorMovies != null && Model.actorMovies.Any())
+        {
+            <div class="actors">
+                @foreach (var actor in Model.actorMovies)
+                {
+                    <div class="actor">
+                        <div class="actor-photo">
+                            @if (!string.IsNullOrEmpty(actor.actor.Image))
+                            {
+                                <img src="~/images/@actor.actor.Image" alt="@actor.actor.Image" loading="lazy" />
+                            }
+                            else
+                            {
+                                <span>@actor.actor.Name</span>
+                            }
+                        </div>
+                        <div class="actor-name">@actor.actor.Name</div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="description">No cast listed.</p>
+        }
+    </section>
+</div>
+
+@section Scripts {
+    <script>
+        // Click a thumbnail to show it as the main image
+        (function () {
+            var main = document.getElementById("mainImg");
+            var thumbs = document.querySelectorAll(".thumb");
+            if (!main || !thumbs.length) return;
+
+            thumbs.forEach(function (t) {
+                t.addEventListener("click", function () {
+                    main.src = t.getAttribute("data-src");
+                    thumbs.forEach(function (x) { x.classList.remove("active"); });
+                    t.classList.add("active");
+                });
+            });
+        })();
+    </script>
+}

@@ -1,0 +1,54 @@
+﻿@section Styles {
+    <style>
+        .form-card {
+            max-width: 640px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .req {
+            color: var(--err);
+        }
+
+        .hint {
+            color: var(--muted);
+            font-size: 13px;
+        }
+    </style>
+}
+
+<div class="card form-card">
+    <form action="/Admin/Cinemas/Create" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="Name">Name <span class="req">*</span></label>
+            <input type="text" id="Name" name="Name" class="form-control"
+                   placeholder="e.g. Vox Cinema" />
+        </div>
+        <div class="form-group">
+            <label for="Image">Cinema Picture <span class="req">*</span></label>
+            <input type="file" id="Image" name="Image" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label for="Description">Description</label>
+            <textarea id="Description" name="Description" class="form-control"
+                      placeholder="Short description of this cinema"></textarea>
+            <span class="hint">Optional, up to 500 characters.</span>
+        </div>
+        <div class="form-group">
+            <label for="Status">Status</label>
+            <select id="Status" name="Status" class="form-control">
+                <option value="true" >Active</option>
+                <option value="false">Inactive</option>
+            </select>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save cinema</button>
+            <a class="btn" href="/Admin/Cinemas/Index">Cancel</a>
+        </div>
+    </form>
+</div>

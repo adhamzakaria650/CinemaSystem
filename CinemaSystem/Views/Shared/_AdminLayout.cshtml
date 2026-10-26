@@ -1,0 +1,369 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - Cinema Admin</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+
+    <script>
+            // Apply saved theme / sidebar state before paint to avoid flicker
+            try {
+                var t = localStorage.getItem("admin-theme");
+                if (t) document.documentElement.setAttribute("data-theme", t);
+                if (localStorage.getItem("admin-collapsed") === "1") document.documentElement.classList.add("sidebar-collapsed");
+            } catch (e) { }
+    </script>
+
+    <style>
+            /* ===== Tokens ===== */
+            :root {
+                --side-bg: #1b1a2e;
+                --side-text: #b9b8d3;
+                --side-active: #2b2950;
+                --accent: #e8b64c;
+                --accent-ink: #2a2005;
+                --bg: #f2f3f8;
+                --surface: #ffffff;
+                --text: #1d2030;
+                --muted: #6b6f85;
+                --line: #e3e5ee;
+                --ok: #1f8a5b;
+                --err: #c8434f;
+                --side-w: 248px;
+                --side-w-collapsed: 72px;
+                --top-h: 64px;
+                --radius: 10px;
+                --font-head: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+                --font-body: "DM Sans", "Segoe UI", system-ui, sans-serif;
+            }
+            [data-theme="dark"] {
+                --bg: #12121c;
+                --surface: #1c1c2b;
+                --text: #ececf6;
+                --muted: #9a9cb5;
+                --line: #2d2d42;
+                --side-bg: #0d0d17;
+                --side-active: #23223d;
+            }
+
+            /* ===== Base ===== */
+            *, *::before, *::after { box-sizing: border-box; }
+            html { -webkit-text-size-adjust: 100%; }
+            body { margin: 0; font-family: var(--font-body); font-size: 15px; line-height: 1.5; color: var(--text); background: var(--bg); }
+            h1, h2, h3 { font-family: var(--font-head); line-height: 1.2; margin: 0; }
+            a { color: inherit; }
+            svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+            :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+            /* ===== Shell ===== */
+            .app { min-height: 100vh; }
+            .main { margin-left: var(--side-w); min-height: 100vh; display: flex; flex-direction: column; transition: margin-left .2s ease; }
+            .sidebar-collapsed .main { margin-left: var(--side-w-collapsed); }
+
+            /* ===== Sidebar ===== */
+            .sidebar { position: fixed; inset: 0 auto 0 0; width: var(--side-w); background: var(--side-bg); color: var(--side-text); display: flex; flex-direction: column; padding: 14px 12px; z-index: 40; transition: width .2s ease, transform .2s ease; }
+            .sidebar-collapsed .sidebar { width: var(--side-w-collapsed); }
+            .brand { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 8px; margin-bottom: 18px; text-decoration: none; color: #fff; font-family: var(--font-head); font-weight: 700; font-size: 18px; white-space: nowrap; }
+            .brand-mark { flex: none; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 9px; background: var(--accent); color: var(--accent-ink); }
+            .nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+            .nav-link { display: flex; align-items: center; gap: 14px; height: 44px; padding: 0 14px; border-radius: 8px; text-decoration: none; color: var(--side-text); white-space: nowrap; border-left: 3px solid transparent; transition: background .15s, color .15s; }
+            .nav-link svg { flex: none; width: 20px; height: 20px; }
+            .nav-link:hover { background: rgba(255,255,255,.06); color: #fff; }
+            .nav-link.active { background: var(--side-active); color: #fff; border-left-color: var(--accent); }
+            .nav-link.active svg { color: var(--accent); }
+            .collapse-btn { display: flex; align-items: center; gap: 14px; height: 40px; padding: 0 14px; border: 0; border-radius: 8px; background: transparent; color: var(--side-text); font: inherit; cursor: pointer; }
+            .collapse-btn svg { width: 20px; height: 20px; transition: transform .2s; }
+            .collapse-btn:hover { background: rgba(255,255,255,.06); color: #fff; }
+            .sidebar-collapsed .brand-text,
+            .sidebar-collapsed .nav-link span,
+            .sidebar-collapsed .collapse-btn span { display: none; }
+            .sidebar-collapsed .collapse-btn svg { transform: rotate(180deg); }
+
+            /* ===== Topbar ===== */
+            .topbar { position: sticky; top: 0; z-index: 30; height: var(--top-h); display: flex; align-items: center; gap: 14px; padding: 0 28px; background: var(--surface); border-bottom: 1px solid var(--line); }
+            .page-title { font-size: 22px; font-weight: 700; }
+            .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+            .icon-btn { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid var(--line); border-radius: 9px; background: transparent; color: var(--text); cursor: pointer; }
+            .icon-btn:hover { background: var(--bg); }
+            .icon-btn svg { width: 20px; height: 20px; }
+            .menu-btn { display: none; }
+            .i-sun { display: none; }
+            [data-theme="dark"] .i-sun { display: block; }
+            [data-theme="dark"] .i-moon { display: none; }
+            .user { display: flex; align-items: center; gap: 10px; }
+            .avatar { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+            .user-name { font-weight: 500; }
+
+            /* ===== Content ===== */
+            .content { flex: 1; padding: 28px; max-width: 1400px; width: 100%; }
+            .footer { padding: 16px 28px; color: var(--muted); font-size: 13px; }
+            .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+            .page-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+
+            /* Buttons */
+            .btn { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--text); font: inherit; font-weight: 500; text-decoration: none; cursor: pointer; }
+            .btn:hover { background: var(--bg); }
+            .btn-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+            .btn-primary:hover { filter: brightness(.95); background: var(--accent); }
+            .btn-danger { background: var(--err); border-color: var(--err); color: #fff; }
+            .btn-danger:hover { background: var(--err); filter: brightness(.92); }
+            .btn-sm { height: 32px; padding: 0 12px; font-size: 13px; }
+
+            /* Forms */
+            .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+            .form-group label { font-weight: 500; }
+            .form-control { width: 100%; min-height: 42px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--text); font: inherit; }
+            .form-control:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: var(--accent); }
+            textarea.form-control { min-height: 110px; resize: vertical; }
+            .text-danger, .field-validation-error { color: var(--err); font-size: 13px; }
+            .img-preview { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+            .img-preview img { width: 96px; height: 96px; object-fit: cover; border-radius: 8px; border: 1px solid var(--line); }
+
+            /* Tables */
+            .table-wrap { overflow-x: auto; }
+            .table { width: 100%; border-collapse: collapse; }
+            .table th, .table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: middle; }
+            .table th { font-weight: 600; color: var(--muted); font-size: 13px; white-space: nowrap; }
+            .table tbody tr:hover { background: var(--bg); }
+            .table img.thumb { width: 44px; height: 60px; object-fit: cover; border-radius: 6px; }
+            .table .actions { display: flex; gap: 8px; }
+            .badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--bg); color: var(--muted); }
+            .badge-ok { background: rgba(31,138,91,.14); color: var(--ok); }
+            .badge-err { background: rgba(200,67,79,.14); color: var(--err); }
+
+            /* Dashboard stats */
+            .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; margin-bottom: 24px; }
+            .stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
+            .stat-label { color: var(--muted); font-size: 14px; }
+            .stat-value { font-family: var(--font-head); font-size: 32px; font-weight: 700; }
+
+            /* Flash + toasts */
+            .flash { padding: 12px 16px; border-radius: 8px; margin-bottom: 18px; font-weight: 500; transition: opacity .4s; }
+            .flash-ok { background: rgba(31,138,91,.14); color: var(--ok); }
+            .flash-err { background: rgba(200,67,79,.14); color: var(--err); }
+            .toasts { position: fixed; right: 20px; bottom: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 100; }
+            .toast { min-width: 240px; padding: 12px 16px; border-radius: 8px; background: var(--side-bg); color: #fff; border-left: 4px solid var(--accent); box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+            .toast.ok { border-left-color: var(--ok); }
+            .toast.err { border-left-color: var(--err); }
+
+            /* Confirm dialog */
+            dialog.confirm { border: 0; border-radius: var(--radius); padding: 24px; width: min(400px, 90vw); background: var(--surface); color: var(--text); }
+            dialog.confirm::backdrop { background: rgba(10,10,20,.55); }
+            dialog.confirm h3 { margin-bottom: 8px; }
+            dialog.confirm .row { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
+            /* ===== Mobile ===== */
+            .scrim { display: none; }
+            @@media (max-width: 900px) {
+                .main, .sidebar-collapsed .main { margin-left: 0; }
+                .sidebar, .sidebar-collapsed .sidebar { width: var(--side-w); transform: translateX(-100%); }
+                .sidebar-collapsed .brand-text,
+                .sidebar-collapsed .nav-link span,
+                .sidebar-collapsed .collapse-btn span { display: inline; }
+                .collapse-btn { display: none; }
+                body.menu-open .sidebar { transform: translateX(0); }
+                body.menu-open .scrim { display: block; position: fixed; inset: 0; background: rgba(10,10,20,.5); z-index: 35; }
+                .menu-btn { display: grid; }
+                .topbar, .content { padding-left: 16px; padding-right: 16px; }
+                .user-name { display: none; }
+            }
+            @@media (prefers-reduced-motion: reduce) {
+                * { transition: none !important; }
+            }
+    </style>
+
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    <div class="app">
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+            <a class="brand" asp-controller="Dashboard" asp-action="Index">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="22" height="22"><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4" /></svg>
+                </span>
+                <span class="brand-text">Cinema Admin</span>
+            </a>
+
+            <nav class="nav">
+                <a class="nav-link" data-controller="Dashboard" asp-controller="Home" asp-action="Index">
+                    <svg viewBox="0 0 24 24"><path d="M3 12l9-8 9 8M5 10v10h5v-6h4v6h5V10" /></svg>
+                    <span>Dashboard</span>
+                </a>
+                <a class="nav-link" data-controller="Movies" asp-controller="Movies" asp-action="Index">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M10 9.5v5l4.5-2.5z" /></svg>
+                    <span>Movies</span>
+                </a>
+                <a class="nav-link" data-controller="Categories" asp-controller="Categories" asp-action="Index">
+                    <svg viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z" /></svg>
+                    <span>Categories</span>
+                </a>
+                <a class="nav-link" data-controller="Cinemas" asp-controller="Cinemas" asp-action="Index">
+                    <svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 10-14 0c0 4.8 7 11 7 11z" /><circle cx="12" cy="10" r="2.5" /></svg>
+                    <span>Cinemas</span>
+                </a>
+                <a class="nav-link" data-controller="Actors" asp-controller="Actors" asp-action="Index">
+                    <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5" /><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M16 4.5a3.5 3.5 0 010 7M18.5 14.4c1.8.8 3 2.6 3 5.6" /></svg>
+                    <span>Actors</span>
+                </a>
+            </nav>
+
+            <button class="collapse-btn" id="collapseBtn" type="button" aria-label="Collapse sidebar">
+                <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6" /></svg>
+                <span>Collapse</span>
+            </button>
+        </aside>
+        <div class="scrim" id="scrim"></div>
+
+        <!-- Main -->
+        <div class="main">
+            <header class="topbar">
+                <button class="icon-btn menu-btn" id="menuBtn" type="button" aria-label="Open menu">
+                    <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+                </button>
+
+                <h1 class="page-title">@ViewData["Title"]</h1>
+
+                <div class="topbar-actions">
+                    <button class="icon-btn" id="themeBtn" type="button" aria-label="Switch light or dark theme">
+                        <svg class="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 019.5 4 8 8 0 1020 14.5z" /></svg>
+                        <svg class="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></svg>
+                    </button>
+                    <div class="user">
+                        <span class="avatar" aria-hidden="true">A</span>
+                        <span class="user-name">Admin</span>
+                    </div>
+                </div>
+            </header>
+
+            <main class="content">
+                @if (TempData["Success"] != null)
+                {
+                    <div class="flash flash-ok" data-flash>@TempData["Success"]</div>
+                }
+                @if (TempData["Error"] != null)
+                {
+                    <div class="flash flash-err" data-flash>@TempData["Error"]</div>
+                }
+
+                @RenderBody()
+            </main>
+
+            <footer class="footer">&copy; @DateTime.Now.Year Cinema System</footer>
+        </div>
+    </div>
+
+    <div class="toasts" id="toasts" aria-live="polite"></div>
+
+    <script>
+            (function () {
+                "use strict";
+                var root = document.documentElement;
+                var body = document.body;
+                function store(key, val) { try { localStorage.setItem(key, val); } catch (e) { } }
+
+                // Sidebar collapse (desktop)
+                var collapseBtn = document.getElementById("collapseBtn");
+                if (collapseBtn) collapseBtn.addEventListener("click", function () {
+                    var collapsed = root.classList.toggle("sidebar-collapsed");
+                    store("admin-collapsed", collapsed ? "1" : "0");
+                });
+
+                // Sidebar open/close (mobile)
+                var menuBtn = document.getElementById("menuBtn");
+                var scrim = document.getElementById("scrim");
+                if (menuBtn) menuBtn.addEventListener("click", function () { body.classList.add("menu-open"); });
+                if (scrim) scrim.addEventListener("click", function () { body.classList.remove("menu-open"); });
+                document.addEventListener("keydown", function (e) { if (e.key === "Escape") body.classList.remove("menu-open"); });
+
+                // Theme toggle
+                var themeBtn = document.getElementById("themeBtn");
+                if (themeBtn) themeBtn.addEventListener("click", function () {
+                    var next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+                    root.setAttribute("data-theme", next);
+                    store("admin-theme", next);
+                });
+
+                // Highlight active nav link
+                var firstSegment = (location.pathname.split("/")[1] || "").toLowerCase();
+                var links = document.querySelectorAll(".nav-link");
+                var matched = false;
+                links.forEach(function (a) {
+                    var c = (a.getAttribute("data-controller") || "").toLowerCase();
+                    if (c && c === firstSegment) { a.classList.add("active"); matched = true; }
+                });
+                if (!matched && links.length) links[0].classList.add("active");
+
+                // Toasts: showToast("Saved", "ok" | "err")
+                window.showToast = function (message, type) {
+                    var box = document.getElementById("toasts");
+                    if (!box) return;
+                    var t = document.createElement("div");
+                    t.className = "toast " + (type || "");
+                    t.textContent = message;
+                    box.appendChild(t);
+                    setTimeout(function () { t.remove(); }, 3500);
+                };
+
+                // Auto-hide flash messages
+                document.querySelectorAll("[data-flash]").forEach(function (el) {
+                    setTimeout(function () {
+                        el.style.opacity = "0";
+                        setTimeout(function () { el.remove(); }, 400);
+                    }, 4000);
+                });
+
+                // Confirm before delete: add data-confirm="Delete this movie?" to a link or button
+                var dialog = document.createElement("dialog");
+                dialog.className = "confirm";
+                dialog.innerHTML =
+                    '<h3>Are you sure?</h3><p class="msg"></p>' +
+                    '<div class="row"><button type="button" class="btn" data-no>Cancel</button>' +
+                    '<button type="button" class="btn btn-danger" data-yes>Delete</button></div>';
+                document.body.appendChild(dialog);
+
+                var pending = null;
+                dialog.querySelector("[data-no]").addEventListener("click", function () { pending = null; dialog.close(); });
+                dialog.querySelector("[data-yes]").addEventListener("click", function () {
+                    var action = pending; pending = null; dialog.close();
+                    if (action) action();
+                });
+                document.addEventListener("click", function (e) {
+                    var el = e.target.closest("a[data-confirm], button[data-confirm]");
+                    if (!el) return;
+                    e.preventDefault();
+                    dialog.querySelector(".msg").textContent = el.getAttribute("data-confirm");
+                    pending = function () {
+                        if (el.tagName === "A") location.href = el.href;
+                        else if (el.form) el.form.submit();
+                    };
+                    dialog.showModal();
+                });
+
+                // Image preview: <input type="file" data-preview="#mainPreview"> + <div id="mainPreview" class="img-preview"></div>
+                document.querySelectorAll("input[type=file][data-preview]").forEach(function (input) {
+                    input.addEventListener("change", function () {
+                        var target = document.querySelector(input.getAttribute("data-preview"));
+                        if (!target) return;
+                        target.innerHTML = "";
+                        Array.prototype.forEach.call(input.files, function (file) {
+                            if (!file.type.startsWith("image/")) return;
+                            var img = document.createElement("img");
+                            img.alt = file.name;
+                            img.src = URL.createObjectURL(file);
+                            img.onload = function () { URL.revokeObjectURL(img.src); };
+                            target.appendChild(img);
+                        });
+                    });
+                });
+            })();
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

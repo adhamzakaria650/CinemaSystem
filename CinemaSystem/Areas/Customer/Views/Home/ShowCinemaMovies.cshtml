@@ -1,0 +1,296 @@
+﻿@using CinemaSystem.ViewModels.Cinema
+@model ShowCinemaMoviesVM
+@section Styles {
+    <style>
+        .back {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--muted);
+            text-decoration: none;
+        }
+
+            .back:hover {
+                color: var(--accent);
+            }
+
+        /* Cinema header */
+        .cinema-head {
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            gap: 32px;
+            align-items: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: var(--surface);
+        }
+
+        .cinema-cover {
+            position: relative;
+            aspect-ratio: 16 / 10;
+            overflow: hidden;
+            border-radius: 10px;
+            background: var(--bg);
+        }
+
+            .cinema-cover img {
+                position: absolute;
+                inset: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+
+            .cinema-cover .none {
+                height: 100%;
+                display: grid;
+                place-items: center;
+                color: var(--muted);
+            }
+
+        .cinema-info h1 {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+
+        .cinema-info p {
+            margin: 0 0 16px;
+            color: var(--muted);
+            max-width: 60ch;
+            white-space: pre-line;
+        }
+
+        .count {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 999px;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .section-title {
+            font-size: 26px;
+            margin-bottom: 20px;
+        }
+
+        /* Movie cards */
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 22px;
+        }
+
+        .movie-card {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform .2s, border-color .2s;
+        }
+
+            .movie-card:hover {
+                transform: translateY(-4px);
+                border-color: var(--accent);
+            }
+
+        .movie-card-link {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .movie-poster {
+            position: relative;
+            aspect-ratio: 2 / 3;
+            overflow: hidden;
+            background: var(--bg);
+        }
+
+            .movie-poster img {
+                position: absolute;
+                inset: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+
+        .movie-poster-none {
+            height: 100%;
+            display: grid;
+            place-items: center;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .movie-tag {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1;
+            padding: 3px 10px;
+            border-radius: 999px;
+            background: rgba(15,15,23,.85);
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .movie-unavailable {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1;
+            padding: 6px;
+            text-align: center;
+            background: rgba(200,67,79,.9);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .movie-body {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 14px;
+            flex: 1;
+        }
+
+        .movie-title {
+            font-size: 17px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .movie-meta {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .movie-foot {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: auto;
+            padding-top: 12px;
+        }
+
+        .movie-price {
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .movie-cta {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .movie-card:hover .movie-cta {
+            color: var(--text);
+        }
+
+        .empty {
+            text-align: center;
+            padding: 50px 0;
+            color: var(--muted);
+            border: 1px dashed var(--line);
+            border-radius: 12px;
+        }
+
+        @@media (max-width: 860px) {
+            .cinema-head {
+                grid-template-columns: 1fr;
+            }
+
+            .cinema-info h1 {
+                font-size: 30px;
+            }
+        }
+    </style>
+}
+
+<a class="back" asp-area="Customer" asp-controller="Home" asp-action="ShowCinemas">&larr; Back to cinemas</a>
+
+<!-- Cinema header -->
+<section class="cinema-head">
+    <div class="cinema-cover">
+        @if (!string.IsNullOrEmpty(Model.Cinema.Image))
+        {
+            <img src="~/images/@Model.Cinema.Image" alt="@Model.Cinema.Name" />
+        }
+        else
+        {
+            <div class="none">No image</div>
+        }
+    </div>
+
+    <div class="cinema-info">
+        <h1>@Model.Cinema.Name</h1>
+        @if (!string.IsNullOrWhiteSpace(Model.Cinema.Description))
+        {
+            <p>@Model.Cinema.Description</p>
+        }
+        <span class="count">@Model.movies.Count @(Model.movies.Count == 1 ? "movie" : "movies") showing</span>
+    </div>
+</section>
+
+<!-- Movies -->
+<h2 class="section-title">Movies at @Model.Cinema.Name</h2>
+
+@if (Model.movies.Count == 0)
+{
+    <div class="empty">No movies are showing at this cinema right now.</div>
+}
+else
+{
+    <div class="movie-grid">
+        @foreach (var movie in Model.movies)
+        {
+            <article class="movie-card">
+                <a class="movie-card-link" asp-area="Customer" asp-controller="Home" asp-action="ShowMovieDetails" asp-route-id="@movie.Id" aria-label="View @movie.Name">
+                    <div class="movie-poster">
+                        @if (!string.IsNullOrEmpty(movie.MainImg))
+                        {
+                            <img src="/images/@movie.MainImg" alt="@movie.Name" loading="lazy" />
+                        }
+                        else
+                        {
+                            <div class="movie-poster-none">No poster</div>
+                        }
+
+                        @if (movie.category != null)
+                        {
+                            <span class="movie-tag">@movie.category.Name</span>
+                        }
+                        @if (!movie.Status)
+                        {
+                            <span class="movie-unavailable">Unavailable</span>
+                        }
+                    </div>
+
+                    <div class="movie-body">
+                        <h3 class="movie-title">@movie.Name</h3>
+                        <p class="movie-meta">
+                            @movie.Time.ToString("dd MMM yyyy") &middot; @movie.Time.ToString("hh:mm tt")
+                        </p>
+                        <div class="movie-foot">
+                            <span class="movie-price">@movie.Price.ToString("0.##") EGP</span>
+                            <span class="movie-cta">Details</span>
+                        </div>
+                    </div>
+                </a>
+            </article>
+        }
+    </div>
+}
