@@ -1,225 +1,224 @@
 ﻿@model Movie
 @section Styles {
-    <style>
-        .form-card {
-            max-width: 640px;
-        }
+	<style>
+		.form-card {
+			max-width: 640px;
+		}
 
-        .form-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--line);
-        }
+		.form-head {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 12px;
+			margin-bottom: 20px;
+			padding-bottom: 16px;
+			border-bottom: 1px solid var(--line);
+		}
 
-            .form-head h2 {
-                font-size: 18px;
-            }
+			.form-head h2 {
+				font-size: 18px;
+			}
 
-            .form-head .id-tag {
-                color: var(--muted);
-                font-size: 13px;
-            }
+			.form-head .id-tag {
+				color: var(--muted);
+				font-size: 13px;
+			}
 
-        .form-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 8px;
-        }
+		.form-actions {
+			display: flex;
+			gap: 10px;
+			margin-top: 8px;
+		}
 
-        .req {
-            color: var(--err);
-        }
+		.req {
+			color: var(--err);
+		}
 
-        .hint {
-            color: var(--muted);
-            font-size: 13px;
-        }
+		.hint {
+			color: var(--muted);
+			font-size: 13px;
+		}
 
-        /* Status switch */
-        .switch-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            padding: 14px 16px;
-            border: 1px solid var(--line);
-            border-radius: 8px;
-        }
+		/* Status switch */
+		.switch-row {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 16px;
+			padding: 14px 16px;
+			border: 1px solid var(--line);
+			border-radius: 8px;
+		}
 
-            .switch-row .switch-text strong {
-                display: block;
-                font-weight: 600;
-            }
+			.switch-row .switch-text strong {
+				display: block;
+				font-weight: 600;
+			}
 
-            .switch-row .switch-text span {
-                color: var(--muted);
-                font-size: 13px;
-            }
+			.switch-row .switch-text span {
+				color: var(--muted);
+				font-size: 13px;
+			}
 
-        .switch {
-            position: relative;
-            flex: none;
-            width: 48px;
-            height: 28px;
-        }
+		.switch {
+			position: relative;
+			flex: none;
+			width: 48px;
+			height: 28px;
+		}
 
-            .switch input {
-                position: absolute;
-                inset: 0;
-                width: 100%;
-                height: 100%;
-                margin: 0;
-                opacity: 0;
-                cursor: pointer;
-                z-index: 1;
-            }
+			.switch input {
+				position: absolute;
+				inset: 0;
+				width: 100%;
+				height: 100%;
+				margin: 0;
+				opacity: 0;
+				cursor: pointer;
+				z-index: 1;
+			}
 
-            .switch .track {
-                position: absolute;
-                inset: 0;
-                border-radius: 999px;
-                background: var(--line);
-                transition: background .2s;
-            }
+			.switch .track {
+				position: absolute;
+				inset: 0;
+				border-radius: 999px;
+				background: var(--line);
+				transition: background .2s;
+			}
 
-                .switch .track::after {
-                    content: "";
-                    position: absolute;
-                    top: 3px;
-                    left: 3px;
-                    width: 22px;
-                    height: 22px;
-                    border-radius: 50%;
-                    background: #fff;
-                    box-shadow: 0 1px 3px rgba(0,0,0,.3);
-                    transition: transform .2s;
-                }
+				.switch .track::after {
+					content: "";
+					position: absolute;
+					top: 3px;
+					left: 3px;
+					width: 22px;
+					height: 22px;
+					border-radius: 50%;
+					background: #fff;
+					box-shadow: 0 1px 3px rgba(0,0,0,.3);
+					transition: transform .2s;
+				}
 
-            .switch input:checked + .track {
-                background: var(--ok);
-            }
+			.switch input:checked + .track {
+				background: var(--ok);
+			}
 
-                .switch input:checked + .track::after {
-                    transform: translateX(20px);
-                }
+				.switch input:checked + .track::after {
+					transform: translateX(20px);
+				}
 
-            .switch input:focus-visible + .track {
-                outline: 2px solid var(--accent);
-                outline-offset: 2px;
-            }
-    </style>
+			.switch input:focus-visible + .track {
+				outline: 2px solid var(--accent);
+				outline-offset: 2px;
+			}
+	</style>
 }
 
 <div class="card form-card">
-    <div class="form-head">
-        <h2>@Model.Name</h2>
-        <span class="id-tag">Id: @Model.Id</span>
-    </div>
+	<div class="form-head">
+		<h2>@Model.Name</h2>
+		<span class="id-tag">Id: @Model.Id</span>
+	</div>
 
-    <form action="/Admin/Movies/Update" method="post">
-        <input type="hidden" name="Id" value="@Model.Id" />
-        <div class="form-group">
-            <label for="Name">Name <span class="req">*</span></label>
-            <input type="text" id="Name" name="Name" class="form-control" value="@Model.Name">
-        </div>
-        <div class="form-group">
-            <label for="MainImage">Movie Main Picture <span class="req">*</span></label>
-            <input type="file" id="MainImage" name="MainImage" class="form-control" />
-        </div>
-        <img src="~/images/@Model.MainImg"/>
-        <div class="form-group">
-            <label for="SubImages">Movie Sub Pictures <span class="req">*</span></label>
-            <input type="file" id="SubImages" name="SubImages" class="form-control" />
-        </div>
-        @foreach (var image in ViewBag.SubImages)
-            {
-                <img src="~/images/@image.Image" />
-            }
+	<form action="/Admin/Movies/Update" method="post" enctype="multipart/form-data">
+		<input type="hidden" name="Id" value="@Model.Id" />
+		<div class="form-group">
+			<label for="Name">Name <span class="req">*</span></label>
+			<input type="text" id="Name" name="Name" class="form-control" value="@Model.Name">
+		</div>
+		<div class="form-group">
+			<label for="MainImage">Movie Main Picture <span class="req">*</span></label>
+			<input type="file" id="MainImage" name="MainImage" class="form-control" />
+		</div>
+		<img src="~/images/@Model.MainImg" />
+		<div class="form-group">
+			<label for="SubImages">Movie Sub Pictures <span class="req">*</span></label>
+			<input type="file" id="SubImages" name="SubImages" class="form-control" multiple/>
+		</div>
+		@foreach (var image in ViewBag.SubImages)
+		{
+			<img src="~/images/@image.Image" />
+		}
 
-        <div class="form-group">
-            <label for="CategoryId">Category</label>
-            <select id="CategoryId" name="CategoryId" class="form-control">
-                    @foreach (var c in ViewBag.Categories)
-                    {
-                        if (Model.categoryId == c.Id)
-                        {
-                            <option selected value=@c.Id>@c.Name</option>    
-                        }
-                        else
-                        {
-                            <option  value=@c.Id>@c.Name</option>
-                        }
-                    }
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="Cinema">Cinema</label>
-            <select id="CinemaId" name="CinemaId" class="form-control">
-                @foreach (var c in ViewBag.Cinemas)
-                {
-                    if (Model.cinemaId == c.Id)
-                    {
-                        <option selected value=@c.Id>@c.Name</option>
-                    }
-                    else
-                    {
-                        <option  value=@c.Id>@c.Name</option>
-                    }
-                }
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="Actors">Actors</label>
-            <select id="ActorId" name="ActorId" class="form-control" multiple>
-                @foreach (var a in ViewBag.Actors)
-                {
-                    if (((IEnumerable<ActorMovie>)ViewBag.Actor_Movies).Any(am => am.ActorID==a.Id))
-                    {
-                        <option selected value=@a.Id>@a.Name</option>
-                    }
-                    else
-                    {
-                        <option  value=@a.Id>@a.Name</option>
-                    }
-                }
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="Price">Price<span class="req">*</span></label>
-            <input type="number" id="Price" name="Price" class="form-control"
-                   value=@Model.Price>
-        </div>
-        <div class="form-group">
-            <label for="Time">Time<span class="req">*</span></label>
-            <input type="datetime-local" id="Time" name="Time" class="form-control"
-                   value=@Model.Time>
-        </div>
-        <div class="form-group">
-            <label for="Description">Description</label>
-            <textarea id="Description" name="Description" class="form-control"
-            >@Model.Description</textarea>
-            <span class="hint">Optional, up to 500 characters.</span>
-        </div>
-        <div class="form-group">
-            <label>Status</label>
-            <div class="switch-row">
-                <div class="switch-text">
-                    <strong>Active</strong>
-                    <span>Inactive movies are hidden from new movies.</span>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" asp-for="Status" aria-label="Active" />
-                    <span class="track"></span>
-                </label>
-            </div>
-        </div>
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Save changes</button>
-            <a class="btn" href="/Admin/Movies/Index">Cancel</a>
-        </div>
-    </form>
+		<div class="form-group">
+			<label for="CategoryId">Category</label>
+			<select id="CategoryId" name="CategoryId" class="form-control">
+				@foreach (var c in ViewBag.Categories)
+				{
+					if (Model.categoryId == c.Id)
+					{
+						<option selected value=@c.Id>@c.Name</option>
+					}
+					else
+					{
+						<option value=@c.Id>@c.Name</option>
+					}
+				}
+			</select>
+		</div>
+		<div class="form-group">
+			<label for="Cinema">Cinema</label>
+			<select id="CinemaId" name="CinemaId" class="form-control">
+				@foreach (var c in ViewBag.Cinemas)
+				{
+					if (Model.cinemaId == c.Id)
+					{
+						<option selected value=@c.Id>@c.Name</option>
+					}
+					else
+					{
+						<option value=@c.Id>@c.Name</option>
+					}
+				}
+			</select>
+		</div>
+		<div class="form-group">
+			<label for="Actors">Actors</label>
+			<select id="ActorId" name="ActorId" class="form-control" multiple>
+				@foreach (var a in ViewBag.Actors)
+				{
+					if (((IEnumerable<ActorMovie>)ViewBag.Actor_Movies).Any(am => am.ActorID == a.Id))
+					{
+						<option selected value=@a.Id>@a.Name</option>
+					}
+					else
+					{
+						<option value=@a.Id>@a.Name</option>
+					}
+				}
+			</select>
+		</div>
+		<div class="form-group">
+			<label for="Price">Price<span class="req">*</span></label>
+			<input type="number" id="Price" name="Price" class="form-control"
+				   value=@Model.Price>
+		</div>
+		<div class="form-group">
+			<label for="Time">Time<span class="req">*</span></label>
+			<input type="datetime-local" id="Time" name="Time" class="form-control"
+				   value=@Model.Time>
+		</div>
+		<div class="form-group">
+			<label for="Description">Description</label>
+			<textarea id="Description" name="Description" class="form-control">@Model.Description</textarea>
+			<span class="hint">Optional, up to 500 characters.</span>
+		</div>
+		<div class="form-group">
+			<label>Status</label>
+			<div class="switch-row">
+				<div class="switch-text">
+					<strong>Active</strong>
+					<span>Inactive movies are hidden from new movies.</span>
+				</div>
+				<label class="switch">
+					<input type="checkbox" asp-for="Status" aria-label="Active" />
+					<span class="track"></span>
+				</label>
+			</div>
+		</div>
+		<div class="form-actions">
+			<button type="submit" class="btn btn-primary">Save changes</button>
+			<a class="btn" href="/Admin/Movies/Index">Cancel</a>
+		</div>
+	</form>
 </div>

@@ -1,5 +1,6 @@
 ﻿using CinemaSystem.Data;
 using CinemaSystem.Models;
+using CinemaSystem.Repositories;
 using CinemaSystem.ViewModels.Actors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,11 +11,15 @@ namespace ActorSystem.Areas.Admin.Controllers
     [Area("Admin")]
     public class ActorsController : Controller
     {
-        private readonly ApplicationDbContext _context = new ApplicationDbContext();
+        //private readonly ApplicationDbContext _context = new ApplicationDbContext();
+        private readonly IRepo<Actor> _ActorRepo = new Repo<Actor>();
+        private readonly IMovieActorsRepo _movieActorsRepo = new ActorMovieRepo();
         public IActionResult Index(ActorFilterVM a)
         {
-            var actors = _context.actors.ToList();
-            var ActorMovies = _context.actor_movies.Include(am => am.movie).ToList(); 
+            var actors = _ActorRepo.GetAll().ToList();
+            //var ActorMovies = _context.actor_movies.Include(am => am.movie).ToList(); 
+            var ActorMovies = _movieActorsRepo.GetAll(Includes: [am => am.movie]).ToList(); 
+
             if (a.Name != null)
             {
                 actors = actors.Where(x => x.Name.Contains(a.Name)).ToList();
@@ -38,7 +43,7 @@ namespace ActorSystem.Areas.Admin.Controllers
             return View();
         }
         [HttpPost]
-        public IActionResult Create(CreateActorVM a)
+        public async Task<IActionResult> Create(CreateActorVM a)
         {
             var fileName = ""; 
             if (a.Image != null && a.Image.Length > 0)
@@ -53,27 +58,29 @@ namespace ActorSystem.Areas.Admin.Controllers
             }
             if (a.Name != null && a.Name.Length > 0)
             {
-                _context.actors.Add(new Actor()
+                await _ActorRepo.AddAsync(new Actor()
                 {
                     Name = a.Name,
                     Description = a.Description,
                     Status = a.Status,
                     Image = fileName
                 });
-                _context.SaveChanges();
+                await _ActorRepo.CommitAsync();
             }
             return RedirectToAction(nameof(Index));
         }
         [HttpGet]
-        public IActionResult Update(int Id)
+        public async Task<IActionResult> Update(int Id)
         {
-            var actor = _context.actors.FirstOrDefault(a=>a.Id==Id);
+            //var actor = _context.actors.FirstOrDefault(a=>a.Id==Id);
+            var actor = await _ActorRepo.GetOneAsync(a=>a.Id==Id);
             return View(actor);
         }
         [HttpPost]
-        public IActionResult Update(UpdateActorVM a)
+        public async Task<IActionResult> Update(UpdateActorVM a)
         {
-            var oldActor = _context.actors.AsNoTracking().FirstOrDefault(ci => ci.Id == a.Id);
+            //var oldActor = _context.actors.AsNoTracking().FirstOrDefault(ci => ci.Id == a.Id);
+            var oldActor = await _ActorRepo.GetOneAsync(ci => ci.Id == a.Id , isTracked:false);
             var fileName = "";
             if (a.Image != null && a.Image.Length > 0)
             {
@@ -95,21 +102,22 @@ namespace ActorSystem.Areas.Admin.Controllers
             }
             if (a.Name != null && a.Name.Length > 0)
             {
-                _context.actors.Update(new Actor()
+                _ActorRepo.Update(new Actor()
                 {
                     Id = a.Id,
                     Name = a.Name,
-                    Description=a.Description,
-                    Status=a.Status,
+                    Description = a.Description,
+                    Status = a.Status,
                     Image = fileName
                 });
-                _context.SaveChanges();
+                await _ActorRepo.CommitAsync();
             }
             return RedirectToAction(nameof(Index));
         }
-        public IActionResult Delete(int Id)
+        public async Task<IActionResult> Delete(int Id)
         {
-            var actor = _context.actors.FirstOrDefault(a=>a.Id == Id);
+            //var actor = _context.actors.FirstOrDefault(a=>a.Id == Id);
+            var actor = await _ActorRepo.GetOneAsync(a=>a.Id == Id);
             if (actor != null)
             {
                 var FilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images\\", actor.Image);
@@ -117,8 +125,9 @@ namespace ActorSystem.Areas.Admin.Controllers
                 {
                     System.IO.File.Delete(FilePath);
                 }
-                _context.actors.Remove(actor);
-                _context.SaveChanges();
+                //_context.actors.Remove(actor);
+                _ActorRepo.Remove(actor);
+                await _ActorRepo.CommitAsync();
             }
             return RedirectToAction(nameof(Index));
         }

@@ -1,4 +1,6 @@
-﻿@section Styles {
+﻿@using CinemaSystem.ViewModels.Movies
+@model CreateMovieVM
+@section Styles {
     <style>
         .form-card {
             max-width: 640px;
@@ -26,15 +28,19 @@
         <div class="form-group">
             <label for="Name">Name <span class="req">*</span></label>
             <input type="text" id="Name" name="Name" class="form-control"
-                   placeholder="e.g. Vox Movie" />
+                   placeholder="e.g. Movie" />
+                   <span asp-validation-for="@Model.Name" class="text-danger"></span>
         </div>
+
         <div class="form-group">
             <label for="Image">Movie Main Picture <span class="req">*</span></label>
             <input type="file" id="MainImage" name="MainImage" class="form-control" />
+            <span asp-validation-for="@Model.MainImage" class="text-danger"></span>
         </div>
         <div class="form-group">
             <label for="Image">Movie Sub Pictures <span class="req">*</span></label>
             <input type="file" id="SubImages" name="SubImages" class="form-control" multiple />
+            <span asp-validation-for="@Model.SubImages" class="text-danger"></span>
         </div>
         <div class="form-group">
             <label for="category">Category</label>
@@ -66,6 +72,7 @@
         <div class="form-group">
             <label for="Price">Price <span class="req">*</span></label>
             <input type="number" id="Price" name="Price" class="form-control" />
+            <span asp-validation-for="@Model.Price" class="text-danger"></span>
         </div>
         <div class="form-group">
             <label for="Time">Time <span class="req">*</span></label>

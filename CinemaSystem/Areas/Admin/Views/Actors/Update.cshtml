@@ -120,7 +120,7 @@
         <span class="id-tag">Id: @Model.Id</span>
     </div>
 
-    <form action="/Admin/Actors/Update" method="post">
+    <form action="/Admin/Actors/Update" method="post" enctype="multipart/form-data">
         <input type="hidden" name="Id" value="@Model.Id" />
         <div class="form-group">
             <label for="Name">Name <span class="req">*</span></label>

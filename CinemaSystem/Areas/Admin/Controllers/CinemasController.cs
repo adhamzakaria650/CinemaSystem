@@ -1,5 +1,6 @@
 ﻿using CinemaSystem.Data;
 using CinemaSystem.Models;
+using CinemaSystem.Repositories;
 using CinemaSystem.ViewModels.Cinema;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,10 +11,11 @@ namespace CinemaSystem.Areas.Admin.Controllers
     [Area("Admin")]
     public class CinemasController : Controller
     {
-        private readonly ApplicationDbContext _context = new ApplicationDbContext();
+        //private readonly ApplicationDbContext _context = new ApplicationDbContext();
+        private readonly IRepo<Cinema> _cinemaRepo = new Repo<Cinema>();
         public IActionResult Index(CinemaFilterVM c)
         {
-            var cinemas = _context.cinemas.ToList();
+            var cinemas = _cinemaRepo.GetAll().ToList();
             if (c.Name != null)
             {
                 cinemas = cinemas.Where(x => x.Name.Contains(c.Name)).ToList();
@@ -33,7 +35,7 @@ namespace CinemaSystem.Areas.Admin.Controllers
             return View();
         }
         [HttpPost]
-        public IActionResult Create(CreateCinemaVM c)
+        public async Task<IActionResult> Create(CreateCinemaVM c)
         {
             var fileName = ""; 
             if (c.Image != null && c.Image.Length > 0)
@@ -48,27 +50,30 @@ namespace CinemaSystem.Areas.Admin.Controllers
             }
             if (c.Name != null && c.Name.Length > 0)
             {
-                _context.cinemas.Add(new Cinema()
+                await _cinemaRepo.AddAsync(new Cinema()
                 {
                     Name = c.Name,
                     Description = c.Description,
                     Status = c.Status,
                     Image = fileName
                 });
-                _context.SaveChanges();
+                await _cinemaRepo.CommitAsync();
             }
             return RedirectToAction("Index");
         }
         [HttpGet]
-        public IActionResult Update(int Id)
+        public async Task<IActionResult> Update(int Id)
         {
-            var cinema = _context.cinemas.FirstOrDefault(c=>c.Id==Id);
+            //var cinema = _context.cinemas.FirstOrDefault(c=>c.Id==Id);
+            var cinema = await _cinemaRepo.GetOneAsync(c=>c.Id==Id);
+
             return View(cinema);
         }
         [HttpPost]
-        public IActionResult Update(UpdateCinemaVM c)
+        public async Task<IActionResult> Update(UpdateCinemaVM c)
         {
-            var oldCinema = _context.cinemas.AsNoTracking().FirstOrDefault(ci => ci.Id == c.Id);
+            //var oldCinema = _context.cinemas.AsNoTracking().FirstOrDefault(ci => ci.Id == c.Id);
+            var oldCinema = await _cinemaRepo.GetOneAsync(ci => ci.Id == c.Id, isTracked: false);
             var fileName = "";
             if (c.Image != null && c.Image.Length > 0)
             {
@@ -90,7 +95,7 @@ namespace CinemaSystem.Areas.Admin.Controllers
             }
             if (c.Name != null && c.Name.Length > 0)
             {
-                _context.cinemas.Update(new Cinema()
+                _cinemaRepo.Update(new Cinema()
                 {
                     Id = c.Id,
                     Name = c.Name,
@@ -98,13 +103,14 @@ namespace CinemaSystem.Areas.Admin.Controllers
                     Status=c.Status,
                     Image = fileName
                 });
-                _context.SaveChanges();
+                await _cinemaRepo.CommitAsync();
             }
             return RedirectToAction(nameof(Index));
         }
-        public IActionResult Delete(int Id)
+        public async Task<IActionResult> Delete(int Id)
         {
-            var cinema = _context.cinemas.FirstOrDefault(c=>c.Id == Id);
+            //var cinema = _context.cinemas.FirstOrDefault(c=>c.Id == Id);
+            var cinema = await _cinemaRepo.GetOneAsync(c => c.Id == Id);
             if (cinema != null)
             {
                 var FilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images\\", cinema.Image);
@@ -112,8 +118,9 @@ namespace CinemaSystem.Areas.Admin.Controllers
                 {
                     System.IO.File.Delete(FilePath);
                 }
-                _context.cinemas.Remove(cinema);
-                _context.SaveChanges();
+                //_context.cinemas.Remove(cinema);
+                _cinemaRepo.Remove(cinema);
+                await _cinemaRepo.CommitAsync();
             }
             return RedirectToAction(nameof(Index));
         }

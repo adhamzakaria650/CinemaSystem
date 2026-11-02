@@ -2,16 +2,19 @@
 using CinemaSystem.Models;
 using Microsoft.AspNetCore.Mvc;
 using CinemaSystem.ViewModels.Category;
+using CinemaSystem.Repositories;
 
 namespace CinemaSystem.Areas.Admin.Controllers
 {
     [Area("Admin")]
     public class CategoriesController : Controller
     {
-        private readonly ApplicationDbContext _context = new ApplicationDbContext();
+        //private readonly ApplicationDbContext _context = new ApplicationDbContext();
+        private readonly IRepo<Category> _CategoryRepo = new Repo<Category>(); 
         public IActionResult Index(CategoryFilterVM c)
         {
-            var categories = _context.categories.ToList();
+            //var categories = _context.categories.ToList();
+            var categories = _CategoryRepo.GetAll().ToList();
             if (c.Name != null)
             {
                 categories = categories.Where(x => x.Name.Contains(c.Name)).ToList();
@@ -31,25 +34,25 @@ namespace CinemaSystem.Areas.Admin.Controllers
             return View();
         }
         [HttpPost]
-        public IActionResult Create(CreateCategoryVM c)
+        public async Task<IActionResult> Create(CreateCategoryVM c)
         {
 
             if (c.Name != null && c.Name.Length > 0)
             {
-                _context.categories.Add(new Category()
+                await _CategoryRepo.AddAsync(new Category()
                 {
                     Name = c.Name,
                     Description = c.Description,
                     Status = c.Status
                 });
-                _context.SaveChanges();
+                await _CategoryRepo.CommitAsync();
             }
             return RedirectToAction("Index");
         }
         [HttpGet]
-        public IActionResult Update(int Id)
+        public async Task<IActionResult> Update(int Id)
         {
-            var category = _context.categories.FirstOrDefault(c=>c.Id==Id);
+            var category = await _CategoryRepo.GetOneAsync(c=>c.Id==Id);
             return View(category);
         }
         [HttpPost]
@@ -57,24 +60,25 @@ namespace CinemaSystem.Areas.Admin.Controllers
         {
             if (c.Name != null && c.Name.Length > 0)
             {
-                _context.categories.Update(new Category()
+                _CategoryRepo.Update(new Category()
                 {
                     Id = c.Id,
                     Name = c.Name,
                     Description=c.Description,
                     Status=c.Status
                 });
-                _context.SaveChanges();
+                _CategoryRepo.CommitAsync();
             }
             return RedirectToAction(nameof(Index));
         }
-        public IActionResult Delete(int Id)
+        public async Task<IActionResult> Delete(int Id)
         {
-            var category = _context.categories.FirstOrDefault(c=>c.Id == Id);
+            var category = await _CategoryRepo.GetOneAsync(c=>c.Id == Id);
             if (category != null)
             {
-                _context.categories.Remove(category);
-                _context.SaveChanges();
+                //_context.categories.Remove(category);
+                _CategoryRepo.Remove(category);
+                await _CategoryRepo.CommitAsync();
             }
             return RedirectToAction(nameof(Index));
         }
