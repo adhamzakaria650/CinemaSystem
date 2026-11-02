@@ -10,7 +10,13 @@ namespace CinemaSystem.Areas.Admin.Controllers
     public class CategoriesController : Controller
     {
         //private readonly ApplicationDbContext _context = new ApplicationDbContext();
-        private readonly IRepo<Category> _CategoryRepo = new Repo<Category>(); 
+        private readonly IRepo<Category> _CategoryRepo;// = new Repo<Category>(); 
+
+        public CategoriesController(IRepo<Category> categoryRepo)
+        {
+            _CategoryRepo = categoryRepo;
+        }
+
         public IActionResult Index(CategoryFilterVM c)
         {
             //var categories = _context.categories.ToList();

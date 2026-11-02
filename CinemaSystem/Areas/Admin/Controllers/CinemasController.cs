@@ -12,7 +12,13 @@ namespace CinemaSystem.Areas.Admin.Controllers
     public class CinemasController : Controller
     {
         //private readonly ApplicationDbContext _context = new ApplicationDbContext();
-        private readonly IRepo<Cinema> _cinemaRepo = new Repo<Cinema>();
+        private readonly IRepo<Cinema> _cinemaRepo; //= new Repo<Cinema>();
+
+        public CinemasController(IRepo<Cinema> cinemaRepo)
+        {
+            _cinemaRepo = cinemaRepo;
+        }
+
         public IActionResult Index(CinemaFilterVM c)
         {
             var cinemas = _cinemaRepo.GetAll().ToList();

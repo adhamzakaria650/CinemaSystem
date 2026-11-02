@@ -1,3 +1,8 @@
+using CinemaSystem.Data;
+using CinemaSystem.Models;
+using CinemaSystem.Repositories;
+using Microsoft.EntityFrameworkCore;
+
 namespace CinemaSystem
 {
     public class Program
@@ -5,11 +10,34 @@ namespace CinemaSystem
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
+
+            var Connection = builder.Configuration.GetConnectionString("DefaultConnection")
+                ?? throw new Exception("Can't Connect With Your DataBase");
+
+
+            builder.Services.AddDbContext<ApplicationDbContext>(
+                options => options.UseSqlServer(Connection)
+                );
+
+
+            builder.Services.AddScoped<IRepo<Actor>, Repo<Actor>>();
+            builder.Services.AddScoped<IMovieActorsRepo, ActorMovieRepo>();
+            builder.Services.AddScoped<IRepo<Category>, Repo<Category>>();
+            builder.Services.AddScoped<IRepo<Cinema>, Repo<Cinema>>();
+            builder.Services.AddScoped<IRepo<Movie>, Repo<Movie>>();
+            builder.Services.AddScoped<IMovieSubImageRepo , MovieSubImageRepo>();
+
+
+            
+
+
+
             var app = builder.Build();
+
+
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
@@ -27,7 +55,7 @@ namespace CinemaSystem
             app.MapStaticAssets();
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{Area=Customer}/{controller=Home}/{action=Index}/{id?}")
+                pattern: "{Area=Admin}/{controller=Home}/{action=Index}/{id?}")
                 .WithStaticAssets();
 
             app.Run();

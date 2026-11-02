@@ -8,10 +8,11 @@ namespace CinemaSystem.Repositories
 {
     public class Repo<T> : IRepo<T> where T : class
     {
-        ApplicationDbContext _context = new ApplicationDbContext();
+        ApplicationDbContext _context; //= new ApplicationDbContext();
         public DbSet<T> _dbset;
-        public Repo()
+        public Repo(ApplicationDbContext context)
         {
+            _context = context;
             _dbset = _context.Set<T>();
         }
         public async Task<EntityEntry<T>> AddAsync(T Entity)

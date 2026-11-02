@@ -13,12 +13,22 @@ namespace MovieSystem.Areas.Admin.Controllers
     public class MoviesController : Controller
     {
         //private readonly ApplicationDbContext _context = new ApplicationDbContext();
-        private readonly IRepo<Movie> _movieRepo = new Repo<Movie>();
-        private readonly IMovieActorsRepo _ActorMovieRepo = new ActorMovieRepo();
-        private readonly IRepo<Actor> _ActorRepo = new Repo<Actor>();
-        private readonly IRepo<Category> _CategoryRepo = new Repo<Category>();
-        private readonly IRepo<Cinema> _CinemaRepo = new Repo<Cinema>();
-        private readonly IMovieSubImageRepo _MovieSubImageRepo = new MovieSubImageRepo();
+        private readonly IRepo<Movie> _movieRepo;//= new Repo<Movie>();
+        private readonly IMovieActorsRepo _ActorMovieRepo;//= new ActorMovieRepo();
+        private readonly IRepo<Actor> _ActorRepo;//= new Repo<Actor>();
+        private readonly IRepo<Category> _CategoryRepo;//= new Repo<Category>();
+        private readonly IRepo<Cinema> _CinemaRepo;//= new Repo<Cinema>();
+        private readonly IMovieSubImageRepo _MovieSubImageRepo;//= new MovieSubImageRepo();
+
+        public MoviesController(IRepo<Movie> movieRepo, IMovieActorsRepo actorMovieRepo, IRepo<Actor> actorRepo, IRepo<Category> categoryRepo, IRepo<Cinema> cinemaRepo, IMovieSubImageRepo movieSubImageRepo)
+        {
+            _movieRepo = movieRepo;
+            _ActorMovieRepo = actorMovieRepo;
+            _ActorRepo = actorRepo;
+            _CategoryRepo = categoryRepo;
+            _CinemaRepo = cinemaRepo;
+            _MovieSubImageRepo = movieSubImageRepo;
+        }
         public IActionResult Index(MovieFilterVM c)
         {
             //var movies = _context.movies.AsQueryable();

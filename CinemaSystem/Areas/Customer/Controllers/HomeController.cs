@@ -13,10 +13,17 @@ namespace CinemaSystem.Areas.Customer.Controllers
     public class HomeController : Controller
     {
         //private readonly ApplicationDbContext _context = new ApplicationDbContext();
-        private readonly IRepo<Movie> _movieRepo = new Repo<Movie>();
-        private readonly IRepo<Cinema> _cinemaRepo = new Repo<Cinema>(); 
-        private readonly IRepo<MovieSubImage> _movieSubImageRepo = new Repo<MovieSubImage>(); 
-        private readonly IRepo<ActorMovie> _ActorMovieRepo = new Repo<ActorMovie>(); 
+        private readonly IRepo<Movie> _movieRepo;//= new Repo<Movie>();
+        private readonly IRepo<Cinema> _cinemaRepo;//= new Repo<Cinema>(); 
+        private readonly IMovieSubImageRepo _movieSubImageRepo;//= new Repo<MovieSubImage>(); 
+        private readonly IMovieActorsRepo _ActorMovieRepo;// = new Repo<ActorMovie>(); 
+        public HomeController(IRepo<Movie> movieRepo, IRepo<Cinema> cinemaRepo, IMovieSubImageRepo movieSubImageRepo, IMovieActorsRepo actorMovieRepo)
+        {
+            _movieRepo = movieRepo;
+            _cinemaRepo = cinemaRepo;
+            _movieSubImageRepo = movieSubImageRepo;
+            _ActorMovieRepo = actorMovieRepo;
+        }
         public IActionResult Index(string Name)
         {
             //var movies = _context.movies.AsQueryable();
@@ -37,7 +44,7 @@ namespace CinemaSystem.Areas.Customer.Controllers
         public async Task<IActionResult> ShowMovieDetails(int id)
         {
             //var movie = _context.movies.Include(m=>m.category).Include(m=>m.cinema).FirstOrDefault(m => m.Id == id);
-            var movie = await _movieRepo.GetOneAsync(Includes: [m => m.category, m => m.cinema]);
+            var movie = await _movieRepo.GetOneAsync(m => m.Id == id, Includes: [m => m.category, m => m.cinema]);
             //var movieSubimages = _context.movie_subimages.Where(si => si.MovieId == id).ToList();
             var movieSubimages = _movieSubImageRepo.GetAll(si => si.MovieId == id).ToList();
             //var movieactors = _context.actor_movies.Where(a => a.MovieID == id).Include(a=>a.actor).ToList();
@@ -48,7 +55,6 @@ namespace CinemaSystem.Areas.Customer.Controllers
                 movieSubImages = movieSubimages,
                 actorMovies = movieactors
             });
-
         }
         public async Task<IActionResult> ShowCinemaMovies(int id)
         {

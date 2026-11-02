@@ -12,8 +12,15 @@ namespace ActorSystem.Areas.Admin.Controllers
     public class ActorsController : Controller
     {
         //private readonly ApplicationDbContext _context = new ApplicationDbContext();
-        private readonly IRepo<Actor> _ActorRepo = new Repo<Actor>();
-        private readonly IMovieActorsRepo _movieActorsRepo = new ActorMovieRepo();
+        private readonly IRepo<Actor> _ActorRepo;//= new Repo<Actor>();
+        private readonly IMovieActorsRepo _movieActorsRepo;// = new ActorMovieRepo();
+
+        public ActorsController(IRepo<Actor> actorRepo, IMovieActorsRepo movieActorsRepo)
+        {
+            _ActorRepo = actorRepo;
+            _movieActorsRepo = movieActorsRepo;
+        }
+
         public IActionResult Index(ActorFilterVM a)
         {
             var actors = _ActorRepo.GetAll().ToList();

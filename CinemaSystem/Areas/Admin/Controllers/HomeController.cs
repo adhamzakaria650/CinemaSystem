@@ -10,10 +10,19 @@ namespace CinemaSystem.Areas.Admin.Controllers
     public class HomeController : Controller
     {
         //private readonly ApplicationDbContext _context = new ApplicationDbContext();
-        private readonly IRepo<Movie> _MovieRepo = new Repo<Movie>(); 
-        private readonly IRepo<Cinema> _cinemaRepo = new Repo<Cinema>(); 
-        private readonly IRepo<Actor> _actorRepo = new Repo<Actor>(); 
-        private readonly IRepo<Category> _categoryRepo = new Repo<Category>(); 
+        private readonly IRepo<Movie> _MovieRepo;//= new Repo<Movie>(); 
+        private readonly IRepo<Cinema> _cinemaRepo;//= new Repo<Cinema>(); 
+        private readonly IRepo<Actor> _actorRepo;// = new Repo<Actor>(); 
+        private readonly IRepo<Category> _categoryRepo;// = new Repo<Category>(); 
+
+        public HomeController(IRepo<Movie> movieRepo, IRepo<Cinema> cinemaRepo, IRepo<Actor> actorRepo, IRepo<Category> categoryRepo)
+        {
+            _MovieRepo = movieRepo;
+            _cinemaRepo = cinemaRepo;
+            _actorRepo = actorRepo;
+            _categoryRepo = categoryRepo;
+        }
+
         public IActionResult Index()
         {
             var viewmodel = new DashboardVM()
