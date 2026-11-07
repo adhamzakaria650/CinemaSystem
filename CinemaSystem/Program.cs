@@ -1,6 +1,9 @@
 using CinemaSystem.Data;
 using CinemaSystem.Models;
 using CinemaSystem.Repositories;
+using CinemaSystem.Utilities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace CinemaSystem
@@ -21,6 +24,12 @@ namespace CinemaSystem
             builder.Services.AddDbContext<ApplicationDbContext>(
                 options => options.UseSqlServer(Connection)
                 );
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            {
+                options.SignIn.RequireConfirmedEmail = true;
+
+            }).AddEntityFrameworkStores<ApplicationDbContext>()
+              .AddDefaultTokenProviders();
 
 
             builder.Services.AddScoped<IRepo<Actor>, Repo<Actor>>();
@@ -29,6 +38,8 @@ namespace CinemaSystem
             builder.Services.AddScoped<IRepo<Cinema>, Repo<Cinema>>();
             builder.Services.AddScoped<IRepo<Movie>, Repo<Movie>>();
             builder.Services.AddScoped<IMovieSubImageRepo , MovieSubImageRepo>();
+            builder.Services.AddTransient<IEmailSender,EmailSender>();
+            builder.Services.AddScoped<IRepo<ApplicationUserOTP>, Repo<ApplicationUserOTP>>();
 
 
             
@@ -55,7 +66,7 @@ namespace CinemaSystem
             app.MapStaticAssets();
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{Area=Admin}/{controller=Home}/{action=Index}/{id?}")
+                pattern: "{Area=Identity}/{controller=Account}/{action=Register}/{id?}")
                 .WithStaticAssets();
 
             app.Run();

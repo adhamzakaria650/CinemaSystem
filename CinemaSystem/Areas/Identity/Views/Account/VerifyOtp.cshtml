@@ -1,0 +1,32 @@
+@model CinemaSystem.ViewModels.Identity.VerifyOtpVM
+
+@{
+    ViewData["Title"] = "VerifyOtp";
+}
+
+<div class="container">
+    <h1>VerifyOtp</h1>
+
+    <h4>VerifyOtp</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-12">
+            <form asp-action="VerifyOtp">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input asp-for="Id" hidden/>
+                <div class="form-group">
+                    <label asp-for="OTP" class="control-label"></label>
+                    <input asp-for="OTP" class="form-control" />
+                    <span asp-validation-for="OTP" class="text-danger"></span>
+                </div>
+                <div class="form-group mt-3">
+                    <input type="submit" value="Verify" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div>
+        <a asp-action="Login">Back to Login</a>
+    </div>
+</div>>

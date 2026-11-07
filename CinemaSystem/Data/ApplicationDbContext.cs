@@ -15,6 +15,7 @@ namespace CinemaSystem.Data
         public DbSet<Actor> actors { get; set; }
         public DbSet<MovieSubImage> movie_subimages { get; set; }
         public DbSet<ActorMovie> actor_movies { get; set; }
+        public DbSet<ApplicationUserOTP> applicationUserOTPs { get; set; }
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         //{
         //    base.OnConfiguring(optionsBuilder);

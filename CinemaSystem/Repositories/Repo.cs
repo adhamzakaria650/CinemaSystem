@@ -54,7 +54,7 @@ namespace CinemaSystem.Repositories
         public IEnumerable<T> GetAll(
             Expression<Func<T, bool>>? Filter = null,
             Expression<Func<T, object>>[]? Includes = null,
-            bool isTracked = false,
+            bool isTracked = true,
             int Skip = -1,
             int Take = -1
            )

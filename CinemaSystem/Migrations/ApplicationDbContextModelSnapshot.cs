@@ -136,6 +136,38 @@ namespace CinemaSystem.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("CinemaSystem.Models.ApplicationUserOTP", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ApplicationUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpirationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("OTP")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.ToTable("applicationUserOTPs");
+                });
+
             modelBuilder.Entity("CinemaSystem.Models.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -392,6 +424,17 @@ namespace CinemaSystem.Migrations
                     b.Navigation("actor");
 
                     b.Navigation("movie");
+                });
+
+            modelBuilder.Entity("CinemaSystem.Models.ApplicationUserOTP", b =>
+                {
+                    b.HasOne("CinemaSystem.Models.ApplicationUser", "applicationUser")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("applicationUser");
                 });
 
             modelBuilder.Entity("CinemaSystem.Models.Movie", b =>

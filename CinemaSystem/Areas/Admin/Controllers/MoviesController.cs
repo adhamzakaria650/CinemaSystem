@@ -322,7 +322,6 @@ namespace MovieSystem.Areas.Admin.Controllers
                 }
                 //_context.movies.Remove(movie);
                 _movieRepo.Remove(movie);
-                await _movieRepo.CommitAsync();
                 if (oldMovieSubImages != null && oldMovieSubImages.Count() > 0)
                 {
                     foreach(var image in oldMovieSubImages)
