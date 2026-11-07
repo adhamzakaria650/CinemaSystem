@@ -1,0 +1,156 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - Cinema</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+
+    <style>
+            :root {
+                color-scheme: dark; /* dark scrollbars, autofill and checkboxes */
+                --bg: #0f0f17;
+                --surface: #1a1a27;
+                --text: #ececf6;
+                --muted: #9a9cb5;
+                --line: #2d2d42;
+                --accent: #e8b64c;
+                --accent-ink: #2a2005;
+                --font-head: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+                --font-body: "DM Sans", "Segoe UI", system-ui, sans-serif;
+            }
+
+            *, *::before, *::after {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                font-family: var(--font-body);
+                font-size: 16px;
+                line-height: 1.6;
+                color: var(--text);
+                background: var(--bg) radial-gradient(ellipse at 50% 0%, rgba(232, 182, 76, .10), transparent 60%) no-repeat;
+            }
+
+            h1, h2, h3 {
+                font-family: var(--font-head);
+                line-height: 1.2;
+                margin: 0;
+            }
+
+            a {
+                color: inherit;
+            }
+
+            svg {
+                fill: none;
+                stroke: currentColor;
+                stroke-width: 1.8;
+                stroke-linecap: round;
+                stroke-linejoin: round;
+            }
+
+            :focus-visible {
+                outline: 2px solid var(--accent);
+                outline-offset: 2px;
+            }
+
+            /* Brand */
+            .auth-top {
+                display: flex;
+                justify-content: center;
+                padding: 28px 20px 0;
+            }
+
+            .logo {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-family: var(--font-head);
+                font-weight: 700;
+                font-size: 22px;
+                text-decoration: none;
+                color: #fff;
+            }
+
+            .logo-mark {
+                display: grid;
+                place-items: center;
+                width: 40px;
+                height: 40px;
+                border-radius: 10px;
+                background: var(--accent);
+                color: var(--accent-ink);
+            }
+
+            /* Page content, centered */
+            main {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 24px 20px;
+            }
+
+            .auth-wrap {
+                width: 100%;
+            }
+
+            /* Footer */
+            .auth-footer {
+                padding: 20px;
+                text-align: center;
+                color: var(--muted);
+                font-size: 13px;
+            }
+
+            @@media (max-width: 520px) {
+                .auth-top {
+                    padding-top: 20px;
+                }
+
+                main {
+                    padding: 16px 12px;
+                }
+            }
+
+            @@media (prefers-reduced-motion: reduce) {
+                * {
+                    transition: none !important;
+                }
+            }
+    </style>
+
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+
+    <header class="auth-top">
+        <a class="logo" href="/" aria-label="Cinema home">
+            <span class="logo-mark" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22"><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4" /></svg>
+            </span>
+            Cinema
+        </a>
+    </header>
+
+    <main>
+        <div class="auth-wrap">
+            @RenderBody()
+        </div>
+    </main>
+
+    <footer class="auth-footer">
+        &copy; @DateTime.Now.Year Cinema. All rights reserved.
+    </footer>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
