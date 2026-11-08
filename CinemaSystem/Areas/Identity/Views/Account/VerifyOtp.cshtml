@@ -5,8 +5,6 @@
 }
 
 <style>
-    /* The page's own container becomes a centered card.
-           :has(> .row) targets only this inner container, not the layout's outer one. */
     .container:has(> .row) {
         width: 100%;
         max-width: 440px;
@@ -50,7 +48,6 @@
             padding: 0;
         }
 
-    /* Form */
     .form-group {
         margin-bottom: 16px;
     }
@@ -75,14 +72,13 @@
         transition: border-color .15s, box-shadow .15s;
     }
 
-        /* The code field: large, centered, spaced out like a verification code */
         .container:has(> .row) .form-control[name="OTP"] {
             height: 56px;
             text-align: center;
             font-size: 24px;
             font-weight: 600;
             letter-spacing: .4em;
-            padding-left: calc(14px + .4em); /* balances the trailing letter-spacing */
+            padding-left: calc(14px + .4em);
         }
 
         .container:has(> .row) .form-control:focus {
@@ -91,13 +87,11 @@
             box-shadow: 0 0 0 3px rgba(232, 182, 76, .25);
         }
 
-        /* Keep browser autofill dark instead of white/yellow */
         .container:has(> .row) .form-control:-webkit-autofill {
             -webkit-text-fill-color: var(--text, #ececf6);
             box-shadow: 0 0 0 1000px var(--bg, #0f0f17) inset;
         }
 
-    /* Validation */
     .container:has(> .row) .input-validation-error {
         border-color: #c8434f;
     }
@@ -126,7 +120,6 @@
             padding-left: 18px;
         }
 
-    /* Submit button */
     .container:has(> .row) .mt-3 {
         margin-top: 1.25rem;
     }
@@ -154,7 +147,6 @@
             outline-offset: 2px;
         }
 
-    /* "Back to Login" link under the form */
     .container:has(> .row) > div:last-child {
         margin-top: 20px;
         text-align: center;
@@ -219,11 +211,9 @@
         var otp = document.querySelector('input[name="OTP"]');
         if (!otp) return;
 
-        // Helps phones show the number keypad and offer the code from the SMS or email
         otp.setAttribute("inputmode", "numeric");
         otp.setAttribute("autocomplete", "one-time-code");
 
-        // Focus the code field, or the first field with an error
         (document.querySelector(".input-validation-error") || otp).focus();
     })();
 </script>

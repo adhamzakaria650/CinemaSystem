@@ -5,8 +5,6 @@
 }
 
 <style>
-	/* The page's own container becomes a centered card.
-		   :has(> .row) targets only this inner container, not the layout's outer one. */
 	.container:has(> .row) {
 		width: 100%;
 		max-width: 440px;
@@ -38,7 +36,6 @@
 			opacity: 1;
 		}
 
-		/* The narrow column (col-md-4) now fills the card */
 		.container:has(> .row) .row {
 			display: block;
 			margin: 0;
@@ -50,7 +47,6 @@
 			padding: 0;
 		}
 
-	/* Form */
 	.form-group {
 		margin-bottom: 16px;
 	}
@@ -81,13 +77,11 @@
 			box-shadow: 0 0 0 3px rgba(232, 182, 76, .25);
 		}
 
-		/* Keep browser autofill dark instead of white/yellow */
 		.container:has(> .row) .form-control:-webkit-autofill {
 			-webkit-text-fill-color: var(--text, #ececf6);
 			box-shadow: 0 0 0 1000px var(--bg, #0f0f17) inset;
 		}
 
-	/* Remember me: checkbox shown before its label, in one row */
 	.container:has(> .row) .form-group:has(input[type="checkbox"]) {
 		display: flex;
 		flex-wrap: wrap;
@@ -116,7 +110,6 @@
 		flex-basis: 100%;
 	}
 
-	/* Validation */
 	.container:has(> .row) .input-validation-error {
 		border-color: #c8434f;
 	}
@@ -145,7 +138,6 @@
 			padding-left: 18px;
 		}
 
-	/* Submit button */
 	.container:has(> .row) .mt-3 {
 		margin-top: 1.25rem;
 	}
@@ -172,7 +164,6 @@
 			outline-offset: 2px;
 		}
 
-	/* Links under the form (Register, ResendEmailConfirmation, ForgetPassword) */
 	.container:has(> .row) > div:not(.row) {
 		margin-top: 10px;
 		text-align: center;
@@ -189,7 +180,7 @@
 				color: var(--accent, #e8b64c);
 				text-decoration: underline;
 			}
-	/* The first link (Register) stands out */
+
 	.container:has(> .row) > div:nth-of-type(2) {
 		margin-top: 22px;
 		font-size: 15px;
@@ -257,7 +248,6 @@
 </div>
 
 <script>
-	// Focus the first field with an error, or the first field on a fresh page
 	(function () {
 		var target = document.querySelector(".input-validation-error") ||
 			document.querySelector("form .form-control");

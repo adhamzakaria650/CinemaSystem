@@ -34,6 +34,7 @@ namespace CinemaSystem.Areas.Identity.Controllers
         {
             if (!ModelState.IsValid)
             {
+                TempData["Error"] = "Please Fill All Fields Correctly";
                 return View(registerVM);
             }
             ApplicationUser user = new ApplicationUser()
@@ -50,6 +51,7 @@ namespace CinemaSystem.Areas.Identity.Controllers
                 {
                     ModelState.AddModelError("", error.Description);
                 }
+                TempData["Error"] = "Please Fill All Fields Correctly";
                 return View(registerVM);
             }
             var ConfirmEmailToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -105,6 +107,7 @@ namespace CinemaSystem.Areas.Identity.Controllers
                 "CinemaSystem Email Confirmation",
                 message
                 );
+            TempData["Success"] = "Account Created Successfully, Please Check Your Email To Verify Your Account";
             return RedirectToAction(nameof(Login));
         }
         [HttpGet]
@@ -113,9 +116,11 @@ namespace CinemaSystem.Areas.Identity.Controllers
             var user = await _userManager.FindByIdAsync(Id);
             if (user == null)
             {
+                TempData["Warning"] = "User Not Found";
                 return NotFound();
             }
             await _userManager.ConfirmEmailAsync(user, Token);
+            TempData["Success"] = "Email Confirmed Successfully, You Can Login Now";
             return RedirectToAction(nameof(Login));
         }
         [HttpGet]
@@ -131,6 +136,7 @@ namespace CinemaSystem.Areas.Identity.Controllers
             if (user == null)
             {
                 ModelState.AddModelError("", "Invalid UserName Or Email Or Password");
+                TempData["Error"] = "Invalid UserName Or Email Or Password";
                 return View(loginVM);
             }
             var result = await _signInManager.PasswordSignInAsync(user, loginVM.Password, loginVM.RememberMe, true);
@@ -138,15 +144,21 @@ namespace CinemaSystem.Areas.Identity.Controllers
             {
                 if (result.IsLockedOut)
                 {
+
                     ModelState.AddModelError("", "To Many Attempts Please Try Again Later");
+                    TempData["Error"] = "To Many Attempts Please Try Again Later";
+                    return View(loginVM);
                 }
                 else
                 {
                     ModelState.AddModelError("", "Invalid UserName Or Email Or Password");
+                    TempData["Error"] = "Invalid UserName Or Email Or Password";
+                    return View(loginVM);
                 }
-                return View(loginVM);
+                
 
             }
+            TempData["Success"] = "Logged In Successfully";
             return RedirectToAction("Index", "Home", new { Area = "Customer" });
         }
         [HttpGet]
@@ -162,6 +174,7 @@ namespace CinemaSystem.Areas.Identity.Controllers
             if (user == null)
             {
                 ModelState.AddModelError("", "User Not Found");
+                TempData["Error"] = "User Not Found";
                 return View(resendEmailConfiramtionVM);
             }
             var ConfirmEmailToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -217,6 +230,7 @@ namespace CinemaSystem.Areas.Identity.Controllers
                 "CinemaSystem Email Confirmation",
                 message
                 );
+            TempData["Success"] = "Email Sent Successfully, Please Check Your Email To Verify Your Account";
             return RedirectToAction(nameof(Login));
         }
         [HttpGet]
@@ -232,6 +246,7 @@ namespace CinemaSystem.Areas.Identity.Controllers
             if (user == null)
             {
                 ModelState.AddModelError("", "User NotFound");
+                TempData["Error"] = "User NotFound";
                 return View(forgetPasswordVM);
             }
             var Otp = new Random().Next(1000, 10000).ToString();
@@ -287,6 +302,7 @@ namespace CinemaSystem.Areas.Identity.Controllers
                 "CinemaSystem Forget Password",
                 message
                 );
+            TempData["Success"] = "OTP Sent Successfully, Please Check Your Email To Verify Your Account";
             return RedirectToAction(nameof(VerifyOtp), new { Id = user.Id });
         }
         [HttpGet]
@@ -305,6 +321,7 @@ namespace CinemaSystem.Areas.Identity.Controllers
             if (UserOTP == null || UserOTP.OTP != verifyOtpVM.OTP)
             {
                 ModelState.AddModelError("", "Invalid / Expired OTP ");
+                TempData["Error"] = "Invalid / Expired OTP ";
                 return View(verifyOtpVM);
             }
             UserOTP.IsUsed = true;
@@ -313,9 +330,11 @@ namespace CinemaSystem.Areas.Identity.Controllers
             if (user == null)
             {
                 ModelState.AddModelError("", "User Not Found");
+                TempData["Error"] = "User Not Found";
                 return View(verifyOtpVM);
             }
             var ResetPasswordToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+            TempData["Success"] = "OTP Verified Successfully, Please Set Your New Password";
             return RedirectToAction(nameof(ResetPassword), new { UserId = user.Id, Token = ResetPasswordToken });
         }
         [HttpGet]
@@ -331,6 +350,7 @@ namespace CinemaSystem.Areas.Identity.Controllers
             if (user == null)
             {
                 ModelState.AddModelError("", "User Not Found");
+                TempData["Error"] = "User Not Found";
                 return View(resetPasswordVM);
             }
             var result = await _userManager.ResetPasswordAsync(user, resetPasswordVM.Token, resetPasswordVM.Password);
@@ -340,8 +360,10 @@ namespace CinemaSystem.Areas.Identity.Controllers
                 {
                     ModelState.AddModelError("", error.Description);
                 }
+                TempData["Error"] = "Please Fill All Fields Correctly";
                 return View(resetPasswordVM);
             }
+            TempData["Success"] = "Password Reset Successfully, You Can Login Now";
             return RedirectToAction(nameof(Login));
         }
     }
